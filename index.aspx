@@ -3,7 +3,9 @@
 <!DOCTYPE html>
 
 <script runat="server">
-
+    protected void ImageButton1_Click(object sender, ImageClickEventArgs e)
+    {
+    }
 </script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -11,9 +13,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
-<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto'/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-    <title></title>
+    <title>이력서 만들기</title>
     <style>
         html,body,h1,h2,h3,h4,h5,h6 {
             font-family: "Roboto", sans-serif
@@ -23,17 +25,17 @@
 <body class="w3-light-grey">
     <form id="form1" runat="server">
         <!-- Page Container -->
-        <div class="w3-content w3-margin-top" style="max-width:1400px;">
+        <div class="w3-content w3-margin-top" style="max-width: 1400px;">
 
           <!-- The Grid -->
           <div class="w3-row-padding">
   
             <!-- Left Column -->
             <div class="w3-third">
-    
               <div class="w3-white w3-text-grey w3-card-4">
                 <div class="w3-display-container">
-                  <img src="https://www.w3schools.com/w3images/avatar_hat.jpg" style="width:100%" alt="Avatar"/>
+                    <asp:FileUpload ID="FileUpload1" runat="server" hidden="hidden"/>
+                    <asp:ImageButton src="https://www.w3schools.com/w3images/avatar_hat.jpg" ID="ImageButton1" runat="server" style="width:100%" OnClick="ImageButton1_Click"/>
                   <div class="w3-display-bottomleft w3-container w3-text-black">
                     <h2>Jane Doe</h2>
                   </div>
@@ -151,5 +153,11 @@
           <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
         </footer>
     </form>
+
+    <script type="text/javascript">
+        document.getElementById("ImageButton1").onclick = function () {
+            document.getElementById("FileUpload1").click();
+        };
+    </script>
 </body>
 </html>
