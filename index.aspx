@@ -3,8 +3,9 @@
 <!DOCTYPE html>
 
 <script runat="server">
-    protected void ImageButton1_Click(object sender, ImageClickEventArgs e)
+    protected void Page_Load(object sender, EventArgs e)
     {
+        ImageButton1.Attributes.Add("onclick", "document.getElementById('FileUpload1').click(); return false;");
     }
 </script>
 
@@ -34,8 +35,9 @@
             <div class="w3-third">
               <div class="w3-white w3-text-grey w3-card-4">
                 <div class="w3-display-container">
-                    <asp:FileUpload ID="FileUpload1" runat="server" hidden="hidden"/>
-                    <asp:ImageButton src="https://www.w3schools.com/w3images/avatar_hat.jpg" ID="ImageButton1" runat="server" style="width:100%" OnClick="ImageButton1_Click"/>
+                    <input type="file" accept="image/jpeg, image/png" id="FileUpload1" hidden="hidden"/>
+                    <asp:ImageButton ID="ImageButton1" runat="server" src="https://www.w3schools.com/w3images/avatar_hat.jpg"
+                        style="width:100%; height: 300px; overflow: hidden;"/>
                   <div class="w3-display-bottomleft w3-container w3-text-black">
                     <h2>Jane Doe</h2>
                   </div>
@@ -155,8 +157,16 @@
     </form>
 
     <script type="text/javascript">
-        document.getElementById("ImageButton1").onclick = function () {
-            document.getElementById("FileUpload1").click();
+        document.getElementById("FileUpload1").onchange = function () {
+            let img = this.files[0];
+            if (img) {
+                var fr = new FileReader();
+                fr.onload = function () {
+                    var result = fr.result;
+                    document.getElementById("ImageButton1").src = result;
+                };
+                fr.readAsDataURL(img);
+            }
         };
     </script>
 </body>
