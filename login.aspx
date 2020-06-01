@@ -26,11 +26,15 @@
                   <div class="w3-container">
                     <div class="w3-section">
                       <label><b>Username</b></label>
-                      <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Username" name="usrname" required/>
+                      <asp:TextBox ID="TextBox1" runat="server" class="w3-input w3-border" placeholder="Enter Username"></asp:TextBox>
+                      <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="아이디를 입력해주세요." ControlToValidate="TextBox1" ForeColor="Red"></asp:RequiredFieldValidator>
+                      <br />
                       <label><b>Password</b></label>
-                      <input class="w3-input w3-border" type="text" placeholder="Enter Password" name="psw" required/>
-                      <button class="w3-button w3-block w3-teal w3-section w3-padding" type="submit">Login</button>
-                      <button class="w3-button w3-margin-top w3-light-grey">Sign up</button>
+                      <asp:TextBox ID="TextBox2" runat="server"  class="w3-input w3-border" TextMode="Password" placeholder="Enter Password"></asp:TextBox>
+                      <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="패스워드를 입력해주세요." ControlToValidate="TextBox2" ForeColor="Red"></asp:RequiredFieldValidator>
+                      <br />
+                      <asp:Button ID="Button1" runat="server" class="w3-button w3-block w3-teal w3-section w3-padding" Text="Login"/>
+                      <asp:Button ID="Button2" runat="server" class="w3-button w3-margin-top w3-light-grey" Text="Sign up" />
                       <span class="w3-right w3-padding w3-margin-top"><a href="./index.aspx">비회원으로 접속</a></span>
                     </div>
                   </div>
