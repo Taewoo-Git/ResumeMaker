@@ -1,10 +1,41 @@
 ﻿<%@ Page Language="C#" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
 
 <!DOCTYPE html>
 
 <script runat="server">
     protected void Page_Load(object sender, EventArgs e)
     {
+        // SqlConnection 개체 생성
+        SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
+        "Integrated Security=False; uid=taewoo; pwd=1111");
+
+        // SqlCommand 개체 생성
+        string sql = "SELECT * FROM Member WHERE email='xass1995@gmail.com'";
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        // SqlConnection 개체 열기
+        con.Open();
+
+        // SqlDataReader 개체 생성
+        SqlDataReader rd = cmd.ExecuteReader();
+
+        // 데이터 조회 및 출력
+        if (rd.Read())
+        {
+            Label1.Text += rd["name"];
+            Label2.Text += rd["job"];
+            Label3.Text += String.Format("({0}) {1}",  rd["zip"], rd["addr"]);
+            Label4.Text += rd["email"];
+            Label5.Text += rd["phone"];
+            Label6.Text += rd["github"];
+        }
+
+        //SqlDataReader 및 SqlConnection 개체 닫기
+        rd.Close();
+        con.Close();
+
+        // 이미지 버튼 클릭 이벤트 추가
         ImageButton1.Attributes.Add("onclick", "document.getElementById('FileUpload1').click(); return false;");
     }
 </script>
@@ -42,16 +73,15 @@
                     <input type="file" accept="image/jpeg, image/png" id="FileUpload1" hidden="hidden"/>
                     <asp:ImageButton ID="ImageButton1" runat="server" src="./res/img/profile.png"
                         style="width:100%; height: 300px; overflow: hidden;"/>
-                  <div class="w3-display-bottomleft w3-container w3-text-black">
-                    <h2>Kim Taewoo</h2>
-                  </div>
+                  <!-- <div class="w3-display-bottomleft w3-container w3-text-black"></div> -->
+                    <h2 style="margin-bottom: 0px"><asp:Label ID="Label1" runat="server" Font-Bold="true" class="w3-margin-left" Text=""/></h2>
                 </div>
                 <div class="w3-container">
-                  <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>Developer</p>
-                  <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i>Seoul, Kor</p>
-                  <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i>xass1995@gmail.com</p>
-                  <p><i class="fa fa-phone fa-fw w3-margin-right w3-large w3-text-teal"></i>010-2969-2563</p
-                  <p><i class="fa fa-github fa-fw w3-margin-right w3-large w3-text-teal"></i>https://github.com/Taewoo-Git</p>
+                  <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label2" runat="server" Text=""/></p>
+                  <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label3" runat="server" Text=""/></p>
+                  <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label4" runat="server" Text=""/></p>
+                  <p><i class="fa fa-phone fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label5" runat="server" Text=""/></p>
+                  <p><i class="fa fa-github fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label6" runat="server" Text=""/></p>
                   <hr/>
 
                   <p class="w3-large w3-text-theme"><b><i class="fa fa-certificate fa-fw w3-margin-right w3-text-teal"></i>Certificate</b></p>
