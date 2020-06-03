@@ -35,7 +35,7 @@
                       <br />
                       <asp:Button ID="Button1" runat="server" class="w3-button w3-block w3-teal w3-section w3-padding" Text="Login"/>
                       <asp:Button ID="Button2" runat="server" class="w3-button w3-margin-top w3-light-grey" Text="Sign up" />
-                      <span class="w3-right w3-padding w3-margin-top"><a href="./index.aspx">비회원으로 접속</a></span>
+                      <span class="w3-right w3-padding w3-margin-top"><a href="./index.aspx?userinfo=none">비회원으로 접속</a></span>
                     </div>
                   </div>
 

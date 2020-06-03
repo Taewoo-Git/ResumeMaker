@@ -6,6 +6,9 @@
 <script runat="server">
     protected void Page_Load(object sender, EventArgs e)
     {
+        string userinfo = Request.QueryString["userinfo"];
+        Response.Write(userinfo);
+
         // SqlConnection 개체 생성
         SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
         "Integrated Security=False; uid=taewoo; pwd=1111");
