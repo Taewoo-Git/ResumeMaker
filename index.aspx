@@ -6,15 +6,14 @@
 <script runat="server">
     protected void Page_Load(object sender, EventArgs e)
     {
-        string userinfo = Request.QueryString["userinfo"];
-        Response.Write(userinfo);
+        string email = Request.QueryString["useremail"];
 
         // SqlConnection 개체 생성
         SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
         "Integrated Security=False; uid=taewoo; pwd=1111");
 
         // SqlCommand 개체 생성
-        string sql = "SELECT * FROM Member WHERE email='xass1995@gmail.com'";
+        string sql = "SELECT * FROM Member WHERE email='" + email + "'";
         SqlCommand cmd = new SqlCommand(sql, con);
 
         // SqlConnection 개체 열기
