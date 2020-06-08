@@ -4,15 +4,16 @@
 <!DOCTYPE html>
 
 <script runat="server">
-    protected void Button1_Click(object sender, EventArgs e)
+
+    protected void btnLogin_Click(object sender, EventArgs e)
     {
         if(Page.IsValid)
         {
-            Label1.Text = "이메일 또는 패스워드가 틀렸습니다.";
+            lblDeny.Text = "이메일 또는 패스워드가 틀렸습니다.";
         }
 
-        string email = TextBox1.Text;
-        string pwd = TextBox2.Text;
+        string email = txtEmail.Text;
+        string pwd = txtPwd.Text;
 
         // SqlConnection 개체 생성
         SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
@@ -33,10 +34,7 @@
         {
             if (pwd == String.Format("{0}", rd["pwd"]))
             {
-                Response.Redirect("index.aspx?useremail=" + email);
-            }
-            else {
-
+                Response.Redirect("resume.aspx?useremail=" + email);
             }
         }
 
@@ -73,17 +71,17 @@
                     
                     <div class="w3-container">
                         <div class="w3-section">
-                            <label><b>Username</b></label>
-                            <asp:TextBox ID="TextBox1" runat="server" class="w3-input w3-border" placeholder="Enter Username"></asp:TextBox>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="아이디를 입력해주세요." ControlToValidate="TextBox1" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+                            <label><b>Email</b></label>
+                            <asp:TextBox ID="txtEmail" runat="server" class="w3-input w3-border" placeholder="Enter Username"></asp:TextBox>
+                            <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="이메일을 입력해주세요." ControlToValidate="TextBox1" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
                             <br />
                             <label><b>Password</b></label>
-                            <asp:TextBox ID="TextBox2" runat="server"  class="w3-input w3-border" TextMode="Password" placeholder="Enter Password"></asp:TextBox>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="패스워드를 입력해주세요." ControlToValidate="TextBox2" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
-                            <asp:Label ID="Label1" runat="server" Text="" ForeColor="Red"></asp:Label>
+                            <asp:TextBox ID="txtPwd" runat="server"  class="w3-input w3-border" TextMode="Password" placeholder="Enter Password"></asp:TextBox>
+                            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="비밀번호를 입력해주세요." ControlToValidate="TextBox2" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+                            <asp:Label ID="lblDeny" runat="server" Text="" ForeColor="Red"></asp:Label>
                             <br />
-                            <asp:Button ID="Button1" runat="server" class="w3-button w3-block w3-teal w3-section w3-padding" Text="Login" OnClick="Button1_Click" OnClientClick="Label_init()"/>
-                            <input type="button" class="w3-button w3-margin-top w3-light-grey" value="Sign up" onclick="Sign_up()" />
+                            <asp:Button ID="btnLogin" runat="server" class="w3-button w3-block w3-teal w3-section w3-padding" Text="Login" OnClick="btnLogin_Click" OnClientClick="initLabel()"/>
+                            <input type="button" class="w3-button w3-margin-top w3-light-grey" value="Sign up" onclick="btnSignup_Click()" />
                             <span class="w3-right w3-padding w3-margin-top"><a href="./index.aspx?useremail=none">비회원으로 접속</a></span>
                         </div>
                     </div>
@@ -95,11 +93,11 @@
     <script type="text/javascript">
         document.getElementById('id01').style.display = 'block';
 
-        function Label_init() {
+        function initLabel() {
             document.getElementById('Label1').innerHTML = "";
         }
 
-        function Sign_up() {
+        function btnSignup_Click() {
             location.href = "./signup.aspx";
         }
     </script>
