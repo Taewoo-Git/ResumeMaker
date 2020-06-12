@@ -8,6 +8,15 @@
     {
         string email = Request.QueryString["useremail"];
 
+        profileSetting(email);
+
+
+        // 이미지 버튼 클릭 이벤트 추가
+        ImageButton1.Attributes.Add("onclick", "document.getElementById('FileUpload1').click(); return false;");
+    }
+
+    protected void profileSetting(string email)
+    {
         // SqlConnection 개체 생성
         SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
         "Integrated Security=False; uid=taewoo; pwd=1111");
@@ -25,20 +34,142 @@
         // 데이터 조회 및 출력
         if (rd.Read())
         {
-            Label1.Text += rd["name"];
-            Label2.Text += rd["job"];
-            Label3.Text += String.Format("({0}) {1}",  rd["zip"], rd["addr"]);
-            Label4.Text += rd["email"];
-            Label5.Text += rd["phone"];
-            Label6.Text += rd["github"];
+            lblName.Text = String.Format("{0}", rd["name"]);
+            lblJob.Text = String.Format("{0}", rd["job"]);
+            lblAddr.Text = String.Format("({0}) {1}",  rd["zip"], rd["addr"]);
+            lblEmail.Text = String.Format("{0}", rd["email"]);
+            lblPhone.Text = String.Format("{0}", rd["phone"]);
+            lblGithub.Text = String.Format("{0}", rd["github"]);
         }
 
         //SqlDataReader 및 SqlConnection 개체 닫기
         rd.Close();
         con.Close();
+    }
 
-        // 이미지 버튼 클릭 이벤트 추가
-        ImageButton1.Attributes.Add("onclick", "document.getElementById('FileUpload1').click(); return false;");
+    protected void btnProfile_Click(object sender, EventArgs e)
+    {
+        if(btnProfile.Text.Equals("수정"))
+        {
+            btnProfile.Text = "완료";
+
+            txtName.Text = lblName.Text;
+            listJob.SelectedValue = lblJob.Text;
+            txtAddr.Text = lblAddr.Text;
+            txtPhone.Text = lblPhone.Text;
+            txtGithub.Text = lblGithub.Text;
+
+            txtName.Visible = true;
+            lblName.Visible = false;
+
+            listJob.Visible = true;
+            lblJob.Visible = false;
+
+            txtAddr.Visible = true;
+            lblAddr.Visible = false;
+
+            txtPhone.Visible = true;
+            lblPhone.Visible = false;
+
+            txtGithub.Visible = true;
+            lblGithub.Visible = false;
+        }
+        else
+        {
+            btnProfile.Text = "수정";
+
+            lblName.Text = txtName.Text;
+            lblJob.Text = listJob.SelectedValue;
+            lblAddr.Text = txtAddr.Text;
+            lblPhone.Text = txtPhone.Text;
+            lblGithub.Text = txtGithub.Text;
+
+            txtName.Visible = false;
+            lblName.Visible = true;
+
+            listJob.Visible = false;
+            lblJob.Visible = true;
+
+            txtAddr.Visible = false;
+            lblAddr.Visible = true;
+
+            txtPhone.Visible = false;
+            lblPhone.Visible = true;
+
+            txtGithub.Visible = false;
+            lblGithub.Visible = true;
+        }
+
+    }
+
+    protected void btnCerti_Click(object sender, EventArgs e)
+    {
+        if (btnCerti.Text.Equals("수정"))
+        {
+            btnCerti.Text = "완료";
+            tbCertiFix.Visible = true;
+        }
+        else
+        {
+            btnCerti.Text = "수정";
+            tbCertiFix.Visible = false;
+        }
+
+    }
+
+    protected void calCerti_SelectionChanged(object sender, EventArgs e)
+    {
+        txtCertiDate.Text = calCerti.SelectedDate.ToShortDateString();
+    }
+
+    protected void btnAddCerti_Click(object sender, EventArgs e)
+    {
+        TableCell cellCertiDate = new TableCell();
+        cellCertiDate.Width = 130;
+        cellCertiDate.Text = txtCertiDate.Text;
+
+        TableCell cellCetiName = new TableCell();
+        cellCetiName.Text = txtCertiName.Text;
+
+        TableRow rowCerti = new TableRow();
+        rowCerti.Height = 35;
+        rowCerti.VerticalAlign = VerticalAlign.Top;
+        rowCerti.Cells.Add(cellCertiDate);
+        rowCerti.Cells.Add(cellCetiName);
+
+        tbCerti.Rows.Add(rowCerti);
+    }
+
+    protected void certificateSetting(string email)
+    {
+        // SqlConnection 개체 생성
+        SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
+        "Integrated Security=False; uid=taewoo; pwd=1111");
+
+        // SqlCommand 개체 생성
+        string sql = "SELECT * FROM Certificate WHERE email='" + email + "'";
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        // SqlConnection 개체 열기
+        con.Open();
+
+        // SqlDataReader 개체 생성
+        SqlDataReader rd = cmd.ExecuteReader();
+
+        // 데이터 조회 및 출력
+        if (rd.Read())
+        {
+            lblName.Text = String.Format("{0}", rd["name"]);
+            lblJob.Text = String.Format("{0}", rd["job"]);
+            lblAddr.Text = String.Format("({0}) {1}",  rd["zip"], rd["addr"]);
+            lblEmail.Text = String.Format("{0}", rd["email"]);
+            lblPhone.Text = String.Format("{0}", rd["phone"]);
+            lblGithub.Text = String.Format("{0}", rd["github"]);
+        }
+
+        //SqlDataReader 및 SqlConnection 개체 닫기
+        rd.Close();
+        con.Close();
     }
 </script>
 
@@ -55,6 +186,19 @@
             font-family: "Roboto", sans-serif
         }
     </style>
+    <script type="text/javascript">
+        function show_calendar() {
+            var cal = document.getElementById("calendar");
+
+            if (cal.className.indexOf("w3-show") == -1) {
+                cal.className += " w3-show";
+            }
+            else {
+                cal.className = x.className.replace(" w3-show", "");
+            }
+            return false;
+        }
+    </script>
 </head>
 <body class="w3-light-grey">
     <form id="form1" runat="server">
@@ -75,26 +219,50 @@
                     <input type="file" accept="image/jpeg, image/png" id="FileUpload1" hidden="hidden"/>
                     <asp:ImageButton ID="ImageButton1" runat="server" src="./res/img/profile.png"
                         style="width:100%; height: 300px; overflow: hidden;"/>
-                  <!-- <div class="w3-display-bottomleft w3-container w3-text-black"></div> -->
-                    <h2 style="margin-bottom: 0px"><asp:Label ID="Label1" runat="server" Font-Bold="true" class="w3-margin-left" Text=""/></h2>
+                    <asp:Button ID="btnProfile" runat="server" Text="수정" CssClass="w3-button w3-teal w3-right w3-margin-right w3-padding-small" style="margin-top:15px;" OnClick="btnProfile_Click"/>
+                    <asp:TextBox ID="txtName" runat="server" Visible="false" CssClass="w3-margin-left" style="width:75%; height:30px; margin-top:15px;" placeholder="이름" Font-Italic="true" Font-Size="Medium"></asp:TextBox>
+                    <h2 style="margin-bottom: 0px"><asp:Label ID="lblName" runat="server" CssClass="w3-margin-left" Text="이름" Font-Bold="true" Font-Italic="true"/></h2>
                 </div>
                 <div class="w3-container">
-                  <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label2" runat="server" Text=""/></p>
-                  <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label3" runat="server" Text=""/></p>
-                  <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label4" runat="server" Text=""/></p>
-                  <p><i class="fa fa-phone fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label5" runat="server" Text=""/></p>
-                  <p><i class="fa fa-github fa-fw w3-margin-right w3-large w3-text-teal"></i><asp:Label ID="Label6" runat="server" Text=""/></p>
+                  <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i>
+                      <asp:Label ID="lblEmail" runat="server" Text="이메일"/></p>
+                  <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>
+                      <asp:DropDownList ID="listJob" runat="server" Visible="false" CssClass="w3-select" style="width:70%; margin-top:0px;">
+                          <asp:ListItem>취업 분야</asp:ListItem>
+                          <asp:ListItem>Developer</asp:ListItem>
+                          <asp:ListItem>Designer</asp:ListItem>
+                      </asp:DropDownList>
+                      <asp:Label ID="lblJob" runat="server" Text="취업 분야"/></p>
+                  <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i>
+                      <asp:TextBox ID="txtAddr" runat="server" Visible="false" style="width:70%;" placeholder="현 거주지"></asp:TextBox>
+                      <asp:Label ID="lblAddr" runat="server" Text="현 거주지"/></p>
+                  <p><i class="fa fa-phone fa-fw w3-margin-right w3-large w3-text-teal"></i>
+                      <asp:TextBox ID="txtPhone" runat="server" Visible="false" style="width:70%;" placeholder="전화번호"></asp:TextBox>
+                      <asp:Label ID="lblPhone" runat="server" Text="전화번호"/></p>
+                  <p><i class="fa fa-github fa-fw w3-margin-right w3-large w3-text-teal"></i>
+                      <asp:TextBox ID="txtGithub" runat="server" Visible="false" style="width:70%;" placeholder="GitHub 주소"></asp:TextBox>
+                      <asp:Label ID="lblGithub" runat="server" Text="GitHub 주소"/></p>
                   <hr/>
 
                   <p class="w3-large w3-text-theme"><b><i class="fa fa-certificate fa-fw w3-margin-right w3-text-teal"></i>Certificate</b></p>
-                    <asp:Table ID="Table1" runat="server">
+                    <asp:Button ID="btnCerti" runat="server" Text="수정" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-50px;" OnClick="btnCerti_Click"/>
+                    
+                    <asp:Table ID="tbCerti" runat="server">
+                    </asp:Table>
+
+                    <asp:Table ID="tbCertiFix" runat="server" Visible="false">
                         <asp:TableRow Height="35px" VerticalAlign="Top">
-                            <asp:TableCell Width="100px">2018.01.02</asp:TableCell>
-                            <asp:TableCell>네트워크 관리사 2급</asp:TableCell>
-                        </asp:TableRow>
-                        <asp:TableRow Height="35px" VerticalAlign="Top">
-                            <asp:TableCell>2012.02.04</asp:TableCell>
-                            <asp:TableCell>MOS master</asp:TableCell>
+                            <asp:TableCell Width="40%">
+                                <i class="fa fa-calendar w3-dropdown-click" onclick="show_calendar()"></i>
+                                <div class="w3-dropdown-content w3-bar-block w3-card-4" id="calendar">
+                                    <asp:Calendar ID="calCerti" runat="server" OnSelectionChanged="calCerti_SelectionChanged"></asp:Calendar>
+                                </div>
+                                <asp:TextBox ID="txtCertiDate" runat="server" placeholder="취득 일자" Width="80%"></asp:TextBox>
+                            </asp:TableCell>
+                            <asp:TableCell Width="50%">
+                                <asp:TextBox ID="txtCertiName" runat="server" placeholder="자격증 이름"></asp:TextBox>
+                                <asp:Button ID="btnAddCerti" runat="server" Text="추가" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-right:-3px;" OnClick="btnAddCerti_Click"/>
+                            </asp:TableCell>
                         </asp:TableRow>
                     </asp:Table>
                   <hr/>

@@ -4,7 +4,6 @@
 <!DOCTYPE html>
 
 <script runat="server">
-
     protected void btnLogin_Click(object sender, EventArgs e)
     {
         if(Page.IsValid)
@@ -34,6 +33,7 @@
         {
             if (pwd == String.Format("{0}", rd["pwd"]))
             {
+                Session["uid"] = email;
                 Response.Redirect("resume.aspx?useremail=" + email);
             }
         }
@@ -59,7 +59,7 @@
     <form id="form1" runat="server">
         <div class="w3-container">
             <div id="id01" class="w3-modal">
-                <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:400px">
+                <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:400px; height: 510px">
                     
                     <div class="w3-container w3-teal">
                         <h3 class="font-righteous">Resume Maker</h3>
@@ -73,16 +73,16 @@
                         <div class="w3-section">
                             <label><b>Email</b></label>
                             <asp:TextBox ID="txtEmail" runat="server" class="w3-input w3-border" placeholder="Enter Username"></asp:TextBox>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="이메일을 입력해주세요." ControlToValidate="TextBox1" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+                            <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="이메일을 입력해주세요." ControlToValidate="txtEmail" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
                             <br />
                             <label><b>Password</b></label>
                             <asp:TextBox ID="txtPwd" runat="server"  class="w3-input w3-border" TextMode="Password" placeholder="Enter Password"></asp:TextBox>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="비밀번호를 입력해주세요." ControlToValidate="TextBox2" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
+                            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="비밀번호를 입력해주세요." ControlToValidate="txtPwd" ForeColor="Red" Display="Dynamic"></asp:RequiredFieldValidator>
                             <asp:Label ID="lblDeny" runat="server" Text="" ForeColor="Red"></asp:Label>
                             <br />
-                            <asp:Button ID="btnLogin" runat="server" class="w3-button w3-block w3-teal w3-section w3-padding" Text="Login" OnClick="btnLogin_Click" OnClientClick="initLabel()"/>
+                            <asp:Button ID="btnLogin" runat="server" class="w3-button w3-block w3-teal w3-padding" Text="Login" OnClick="btnLogin_Click" OnClientClick="initLabel()"/>
                             <input type="button" class="w3-button w3-margin-top w3-light-grey" value="Sign up" onclick="btnSignup_Click()" />
-                            <span class="w3-right w3-padding w3-margin-top"><a href="./index.aspx?useremail=none">비회원으로 접속</a></span>
+                            <span class="w3-right w3-padding w3-margin-top"><a href="./resume.aspx?useremail=none">비회원으로 접속</a></span>
                         </div>
                     </div>
                 </div>
