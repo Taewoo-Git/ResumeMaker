@@ -33,7 +33,7 @@
         {
             if (pwd == String.Format("{0}", rd["pwd"]))
             {
-                Session["uid"] = email;
+                Session["usersession"] = email;
                 Response.Redirect("resume.aspx?useremail=" + email);
             }
         }
