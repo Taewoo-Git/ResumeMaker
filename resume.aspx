@@ -4,6 +4,10 @@
 <!DOCTYPE html>
 
 <script runat="server">
+    // SqlConnection 개체 생성
+    SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
+            "Integrated Security=False; uid=taewoo; pwd=1111");
+
     protected void Page_Load(object sender, EventArgs e)
     {
         string email = Request.QueryString["useremail"];
@@ -16,10 +20,6 @@
 
     protected void selectProfile(string email)
     {
-        // SqlConnection 개체 생성
-        SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
-        "Integrated Security=False; uid=taewoo; pwd=1111");
-
         // SqlCommand 개체 생성
         string sql = "SELECT * FROM Member WHERE email='" + email + "'";
         SqlCommand cmd = new SqlCommand(sql, con);
@@ -105,7 +105,7 @@
     {
         if (btnCerti.Text.Equals("수정"))
         {
-            btnCerti.Text = "완료";
+            btnCerti.Text = "취소";
             tbCertiFix.Visible = true;
             gvCerti.Columns[3].Visible = true;
         }
@@ -124,23 +124,86 @@
 
     protected void insertCertiBtn_Click(object sender, EventArgs e)
     {
-        SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
-        "Integrated Security=False; uid=taewoo; pwd=1111");
+        if(txtCertiDate.Text.Length != 0 && txtCertiName.Text.Length != 0)
+        {
+            string sql = "INSERT INTO Certificate VALUES(@email, @date, @name)";
+            SqlCommand cmd = new SqlCommand(sql, con);
 
-        string sql = "INSERT INTO Certificate VALUES(@email, @date, @name)";
+            cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+            cmd.Parameters.AddWithValue("@date", txtCertiDate.Text);
+            cmd.Parameters.AddWithValue("@name", txtCertiName.Text);
+
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+
+            txtCertiDate.Text = "";
+            txtCertiName.Text = "";
+
+            Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+        }
+    }
+
+    protected void deleteSkillsBtn_Command(object sender, CommandEventArgs e)
+    {
+        string sql = "DELETE FROM Skills WHERE email = @email and num = @num";
         SqlCommand cmd = new SqlCommand(sql, con);
 
         cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@date", txtCertiDate.Text);
-        cmd.Parameters.AddWithValue("@name", txtCertiName.Text);
+        cmd.Parameters.AddWithValue("@num", e.CommandArgument.ToString());
 
         con.Open();
         cmd.ExecuteNonQuery();
         con.Close();
 
-        txtCertiDate.Text = "";
-        txtCertiName.Text = "";
+        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+    }
 
+    protected void btnSkills_Click(object sender, EventArgs e)
+    {
+        if(btnSkills.Text.Equals("수정"))
+        {
+            btnSkills.Text = "취소";
+            for (int i = 0; i < dlSkills.Items.Count; i++)
+            {
+                dlSkills.Items[i].Controls[1].Visible = true;
+            }
+            rangeSkillsPanel.Visible = true;
+        }
+        else
+        {
+            btnSkills.Text = "수정";
+            for (int i = 0; i < dlSkills.Items.Count; i++)
+            {
+                dlSkills.Items[i].Controls[1].Visible = false;
+            }
+            rangeSkillsPanel.Visible = false;
+        }
+    }
+
+    protected void insertSkillsBtn_Click(object sender, EventArgs e)
+    {
+        if(txtSkillsName.Text.Length != 0)
+        {
+            string sql = "INSERT INTO Skills VALUES(@email, @value, @name)";
+            SqlCommand cmd = new SqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+            cmd.Parameters.AddWithValue("@value", fieldSkillsValue.Value);
+            cmd.Parameters.AddWithValue("@name", txtSkillsName.Text);
+
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+
+            txtSkillsName.Text = "";
+
+            Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+        }
+    }
+
+    protected void gvCerti_RowDeleted(object sender, GridViewDeletedEventArgs e)
+    {
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 </script>
@@ -156,6 +219,69 @@
     <style>
         html,body,h1,h2,h3,h4,h5,h6 {
             font-family: "Roboto", sans-serif
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            margin: 20px 0;
+            width: 100%;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #009688;
+            border-radius: 25px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 4px 0 rgba(0,0,0, 1);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+        }
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #009688;
+        }
+        .range-wrap{
+            width: 100%;
+            position: relative;
+        }
+        .range-value{
+            position: absolute;
+            top: -50%;
+        }
+        .range-value span{
+            width: 30px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            background: #009688;
+            color: #fff;
+            font-size: 12px;
+            display: block;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, 0);
+            border-radius: 6px;
+        }
+        .range-value span:before{
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 10px solid #009688;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            margin-top: -1px;
         }
     </style>
     <script type="text/javascript">
@@ -188,11 +314,14 @@
                             <input type="file" accept="image/jpeg, image/png" id="FileUpload1" hidden="hidden"/>
                             <asp:ImageButton ID="ImageButton1" runat="server" src="./res/img/profile.png"
                                 style="width:100%; height: 300px; overflow: hidden;"/>
+
                             <asp:Button ID="btnProfile" runat="server" Text="수정" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:15px; margin-right:20px;" OnClick="btnProfile_Click"/>
                             <asp:TextBox ID="txtName" runat="server" Visible="false" CssClass="w3-margin-left" style="width:75%; height:30px; margin-top:15px;" placeholder="이름" Font-Italic="true" Font-Size="Medium"></asp:TextBox>
                             <h2 style="margin-bottom: 0px"><asp:Label ID="lblName" runat="server" CssClass="w3-margin-left" Text="이름" Font-Bold="true" Font-Italic="true"/></h2>
                         </div>
+
                         <div class="w3-container">
+
                             <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i>
                                 <asp:Label ID="lblEmail" runat="server" Text="이메일"/></p>
                             <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>
@@ -212,10 +341,11 @@
                                 <asp:TextBox ID="txtGithub" runat="server" Visible="false" style="width:70%;" placeholder="GitHub 주소"></asp:TextBox>
                                 <asp:Label ID="lblGithub" runat="server" Text="GitHub 주소"/></p>
                             <hr/>
+
                             <p class="w3-large w3-text-theme"><b><i class="fa fa-certificate fa-fw w3-margin-right w3-text-teal"></i>Certificate</b></p>
                             <asp:Button ID="btnCerti" runat="server" Text="수정" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-50px; margin-right:2.5px;" OnClick="btnCerti_Click" />
                             
-                            <asp:GridView ID="gvCerti" runat="server" AutoGenerateColumns="False" DataSourceID="SqlDataSource1"
+                            <asp:GridView ID="gvCerti" runat="server" AutoGenerateColumns="False" DataSourceID="SqlDataSource1" OnRowDeleted="gvCerti_RowDeleted"
                                 Height="35px" Width="100%" BorderStyle="None" BorderColor="White" ShowHeader="false" DataKeyNames="num">
                                 <Columns>
                                     <asp:BoundField DataField="date" SortExpression="date" ItemStyle-Width="130" ItemStyle-CssClass="w3-padding-small">
@@ -224,7 +354,7 @@
                                     </asp:BoundField>
                                     <asp:BoundField DataField="num" SortExpression="num" ItemStyle-Width="10" Visible="false">
                                     </asp:BoundField>
-                                    <asp:CommandField ButtonType="Button" ShowDeleteButton="true" ControlStyle-CssClass="w3-button w3-red w3-right w3-padding-small" Visible="false" />
+                                    <asp:CommandField ButtonType="Button" ShowDeleteButton="true" ControlStyle-CssClass="w3-button w3-red w3-right w3-padding-small" Visible="false"/>
                                 </Columns>
                             </asp:GridView>
                             
@@ -255,23 +385,47 @@
                                         <asp:TextBox ID="txtCertiName" runat="server" placeholder="자격증 이름" style="padding-left:5px; outline:none;"></asp:TextBox>
                                     </asp:TableCell>
                                     <asp:TableCell>
-                                        <asp:Button ID="btnAddCerti" runat="server" Text="추가" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-right:-0.5px;" OnClick="insertCertiBtn_Click"/>
+                                        <asp:Button ID="insertCertiBtn" runat="server" Text="추가" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-right:-0.5px;" OnClick="insertCertiBtn_Click"/>
                                     </asp:TableCell>
                                 </asp:TableRow>
                             </asp:Table>
                             <hr/>
                             
-                            <p class="w3-large"><b><i class="fa fa-sliders fa-fw w3-margin-right w3-text-teal"></i>Skills</b></p>
-                            <p>C#</p>
-                            <div class="w3-light-grey w3-round-xlarge w3-small">
-                                <div class="w3-container w3-center w3-round-xlarge w3-teal" style="width:70%">70%</div>
-                            </div>
-                            <p>ASP.NET</p>
-                            <div class="w3-light-grey w3-round-xlarge w3-small">
-                                <div class="w3-container w3-center w3-round-xlarge w3-teal" style="width:60%">60%</div>
-                            </div><br/>
+                            <p class="w3-large w3-text-theme"><b><i class="fa fa-sliders fa-fw w3-margin-right w3-text-teal"></i>Skills</b></p>
+                            <asp:Button ID="btnSkills" runat="server" Text="수정" OnClick="btnSkills_Click" 
+                                CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-50px; margin-right:2.5px;" />
+
+                            <asp:DataList ID="dlSkills" runat="server" DataSourceID="SqlDataSource2" ItemStyle-Width="430px">
+                                <ItemTemplate>
+                                    <p><%# Eval("name") %></p>
+                                    <asp:Button ID="deleteSkillsBtn" runat="server" Text="삭제" OnCommand="deleteSkillsBtn_Command" CommandArgument='<%# Eval("num") %>'
+                                        CssClass="w3-button w3-red w3-right w3-padding-small skillsDelBtn" style="margin-top:-45px; margin-right:1px;" Visible="false"/>
+                                    <div class="w3-light-grey w3-round-xlarge w3-small w3-margin-bottom">
+                                        <div class="w3-container w3-center w3-round-xlarge w3-teal valSkills" style="width:100%"><%# Eval("value") %>%</div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:DataList><br />
+
+                            <asp:SqlDataSource ID="SqlDataSource2" runat="server" ConnectionString="<%$ ConnectionStrings:resume_maker_dbConnectionString2 %>"
+                                SelectCommand="SELECT [num], [value], [name] FROM [Skills] WHERE ([email] = @email)">
+                                <SelectParameters>
+                                    <asp:QueryStringParameter Name="email" QueryStringField="useremail" Type="String" />
+                                </SelectParameters>
+                            </asp:SqlDataSource>
+
+                            <asp:Panel ID="rangeSkillsPanel" runat="server" CssClass="w3-margin-bottom" Visible="false"><br />
+                                <div class="range-wrap">
+                                    <div class="range-value" id="skillsRangeDivision"></div>
+                                    <input id="skillsRange" type="range" min="1" max="100" value="1" step="1" onchange="skillsRange_Change()" />
+                                    <asp:HiddenField ID="fieldSkillsValue" runat="server" Value=""/>
+                                </div>
+                                <asp:TextBox ID="txtSkillsName" runat="server" Width="350px" style="padding-left:5px; outline:none;" placeholder="보유 기술 명칭"></asp:TextBox>
+                                <asp:Button ID="insertSkillsBtn" runat="server" Text="추가" OnClick="insertSkillsBtn_Click"
+                                    CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-right:2px;" /><br /><br />
+                            </asp:Panel>
+                            
                         </div>
-                    </div><br/>
+                    </div>
 
                 </div>
                 
@@ -321,6 +475,11 @@
     </form>
 
     <script type="text/javascript">
+        var valSkills = document.getElementsByClassName('valSkills');
+        for (element of valSkills) {
+            element.style.width = element.innerText;
+        }
+
         document.getElementById("FileUpload1").onchange = function () {
             let img = this.files[0];
             if (img) {
@@ -332,6 +491,23 @@
                 fr.readAsDataURL(img);
             }
         };
+
+        const
+            range = document.getElementById('skillsRange'),
+            rangeV = document.getElementById('skillsRangeDivision'),
+            setValue = () => {
+                const
+                    newValue = Number((range.value - range.min) * 100 / (range.max - range.min)),
+                    newPosition = 10 - (newValue * 0.2);
+                rangeV.innerHTML = `<span>${range.value}</span>`;
+                rangeV.style.left = `calc(${newValue}% + (${newPosition}px))`;
+            };
+        document.addEventListener("DOMContentLoaded", setValue);
+        range.addEventListener('input', setValue);
+
+        function skillsRange_Change() {
+            fieldSkillsValue.value = skillsRange.value;
+        }
     </script>
 </body>
 </html>
