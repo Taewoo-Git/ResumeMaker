@@ -206,18 +206,30 @@
     {
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
+
+    protected void btnWorkAdd_Click(object sender, EventArgs e)
+    {
+        Panel1.Visible = true;
+    }
+
+    protected void btnWorkEdit_Click(object sender, EventArgs e)
+    {
+        Panel2.Visible = true;
+    }
 </script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
     <title>이력서 만들기</title>
     <style>
-        html,body,h1,h2,h3,h4,h5,h6 {
+        html, body {
             font-family: "Roboto", sans-serif
         }
         input[type=range] {
@@ -326,11 +338,11 @@
                                 <asp:Label ID="lblEmail" runat="server" Text="이메일"/></p>
                             <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>
                                 <asp:DropDownList ID="listJob" runat="server" Visible="false" CssClass="w3-select" style="width:70%; margin-top:0px;">
-                                    <asp:ListItem>취업 분야</asp:ListItem>
+                                    <asp:ListItem>직업</asp:ListItem>
                                     <asp:ListItem>Developer</asp:ListItem>
                                     <asp:ListItem>Designer</asp:ListItem>
                                 </asp:DropDownList>
-                                <asp:Label ID="lblJob" runat="server" Text="취업 분야"/></p>
+                                <asp:Label ID="lblJob" runat="server" Text="직업"/></p>
                             <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i>
                                 <asp:TextBox ID="txtAddr" runat="server" Visible="false" style="width:70%;" placeholder="현 거주지"></asp:TextBox>
                                 <asp:Label ID="lblAddr" runat="server" Text="현 거주지"/></p>
@@ -346,7 +358,7 @@
                             <asp:Button ID="btnCerti" runat="server" Text="수정" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-50px; margin-right:2.5px;" OnClick="btnCerti_Click" />
                             
                             <asp:GridView ID="gvCerti" runat="server" AutoGenerateColumns="False" DataSourceID="SqlDataSource1" OnRowDeleted="gvCerti_RowDeleted"
-                                Height="35px" Width="100%" BorderStyle="None" BorderColor="White" ShowHeader="false" DataKeyNames="num">
+                                Height="35px" Width="100%" BorderStyle="None" BorderColor="White" ShowHeader="false" DataKeyNames="num" >
                                 <Columns>
                                     <asp:BoundField DataField="date" SortExpression="date" ItemStyle-Width="130" ItemStyle-CssClass="w3-padding-small">
                                     </asp:BoundField>
@@ -397,23 +409,23 @@
 
                             <asp:DataList ID="dlSkills" runat="server" DataSourceID="SqlDataSource2" ItemStyle-Width="430px">
                                 <ItemTemplate>
-                                    <p><%# Eval("name") %></p>
+                                    <p style="margin-top:5px; margin-bottom:5px; padding-left:5px;"><%# Eval("name") %></p>
                                     <asp:Button ID="deleteSkillsBtn" runat="server" Text="삭제" OnCommand="deleteSkillsBtn_Command" CommandArgument='<%# Eval("num") %>'
-                                        CssClass="w3-button w3-red w3-right w3-padding-small skillsDelBtn" style="margin-top:-45px; margin-right:1px;" Visible="false"/>
+                                        CssClass="w3-button w3-red w3-right w3-padding-small" style="margin-top:-40px; margin-right:1px;" Visible="false"/>
                                     <div class="w3-light-grey w3-round-xlarge w3-small w3-margin-bottom">
                                         <div class="w3-container w3-center w3-round-xlarge w3-teal valSkills" style="width:100%"><%# Eval("value") %>%</div>
                                     </div>
                                 </ItemTemplate>
                             </asp:DataList><br />
 
-                            <asp:SqlDataSource ID="SqlDataSource2" runat="server" ConnectionString="<%$ ConnectionStrings:resume_maker_dbConnectionString2 %>"
+                            <asp:SqlDataSource ID="SqlDataSource2" runat="server" ConnectionString="<%$ ConnectionStrings:resume_maker_dbConnectionString %>"
                                 SelectCommand="SELECT [num], [value], [name] FROM [Skills] WHERE ([email] = @email)">
                                 <SelectParameters>
                                     <asp:QueryStringParameter Name="email" QueryStringField="useremail" Type="String" />
                                 </SelectParameters>
                             </asp:SqlDataSource>
 
-                            <asp:Panel ID="rangeSkillsPanel" runat="server" CssClass="w3-margin-bottom" Visible="false"><br />
+                            <asp:Panel ID="rangeSkillsPanel" runat="server" CssClass="w3-margin-bottom" Visible="false">
                                 <div class="range-wrap">
                                     <div class="range-value" id="skillsRangeDivision"></div>
                                     <input id="skillsRange" type="range" min="1" max="100" value="1" step="1" onchange="skillsRange_Change()" />
@@ -426,21 +438,94 @@
                             
                         </div>
                     </div>
-
                 </div>
                 
                 <div class="w3-twothird">
                     
                     <div class="w3-container w3-card w3-white w3-margin-bottom">
                         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Work Experience</h2>
-                        <div class="w3-container">
-                            <h5 class="w3-opacity"><b>대한민국 육군</b></h5>
-                            <h6 class="w3-text-teal"><i class="fa fa-calendar fa-fw w3-margin-right"></i>Jul 2016 - Apr 2018</h6>
-                            <p>23사단 57연대 통신중대 전술C4I운용/정비병으로 근무.</p>
-                        </div><br/>
+                        <asp:Button ID="btnWorkAdd" runat="server" Text="추가" OnClick="btnWorkAdd_Click" 
+                                CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:2.5px;" />
+                        <asp:Button ID="btnWorkEdit" runat="server" Text="수정" OnClick="btnWorkEdit_Click" 
+                                CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
+
+                        <asp:ListView ID="lvWork" runat="server" DataSourceID="SqlDataSource3">
+                            <ItemTemplate>
+                                <div class="w3-container">
+                                    <h5 class="w3-opacity"><b><%# Eval("title") %></b></h5>
+                                    <h6 class="w3-text-teal"><i class="fa fa-calendar fa-fw w3-margin-right"></i><%# Eval("joindate") %> - <%# Eval("leavedate") %></h6>
+                                    <p><%# Eval("contents") %></p>
+                                </div>
+                            </ItemTemplate>
+                        </asp:ListView>
+
+                        <asp:DataPager ID="DataPager1" runat="server" PageSize="1" PagedControlID="lvWork">
+                            <Fields>
+                                <asp:NextPreviousPagerField ButtonType="Button" ButtonCssClass="w3-button w3-teal w3-padding-small w3-margin-left"/>
+                            </Fields>
+                        </asp:DataPager>
+
+                        <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:resume_maker_dbConnectionString %>"
+                            SelectCommand="SELECT [title], [joindate], [leavedate], [contents] FROM [Work] WHERE ([email] = @email)">
+                            <SelectParameters>
+                                <asp:QueryStringParameter Name="email" QueryStringField="useremail" Type="String" />
+                            </SelectParameters>
+                        </asp:SqlDataSource>
+                        <br /><br />
+
+                        <asp:Panel ID="Panel1" runat="server" Visible="false">
+                            <hr />
+
+                            <asp:TextBox ID="TextBox1" runat="server" placeholder="회사 명" style="width:92%; height:37px; padding-left:5px;"></asp:TextBox>
+                            <asp:Button ID="Button2" runat="server" Text="등록" OnClick="btnSkills_Click" 
+                                    CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
+                            <br /><br />
+
+                            <div>
+                                <asp:TextBox ID="TextBox6" runat="server" Width="50"></asp:TextBox>
+                                <asp:Label ID="Label2" runat="server" Text="년" ForeColor="Gray"></asp:Label> &nbsp;
+                                <asp:TextBox ID="TextBox5" runat="server" Width="30"></asp:TextBox>
+                                <asp:Label ID="Label1" runat="server" Text="월  입사" ForeColor="Gray"></asp:Label>
+                                &nbsp; <a style="color:gray;">~</a> &nbsp;
+                                <asp:TextBox ID="TextBox3" runat="server" Width="50"></asp:TextBox>
+                                <asp:Label ID="Label3" runat="server" Text="년" ForeColor="Gray"></asp:Label> &nbsp;
+                                <asp:TextBox ID="TextBox7" runat="server" Width="30"></asp:TextBox>
+                                <asp:Label ID="Label4" runat="server" Text="월  퇴사" ForeColor="Gray"></asp:Label>
+                            </div><br />
+
+                            <asp:TextBox ID="TextBox4" runat="server" placeholder="직무 내용을 입력해 주세요." TextMode="MultiLine" style="width:100%; height:250px; padding-left:5px;"></asp:TextBox>
+                            <br /><br />
+                        </asp:Panel>
+
+                        <asp:Panel ID="Panel2" runat="server" Visible="false">
+                            <hr />
+
+                            <asp:TextBox ID="TextBox2" runat="server" placeholder="회사 명" style="width:85%; height:38px; padding-left:5px;"></asp:TextBox>
+                            <asp:Button ID="Button4" runat="server" Text="삭제" OnClick="btnSkills_Click" 
+                                    CssClass="w3-button w3-red w3-right" style="margin-top:0px; margin-right:2.5px;" />
+                            <asp:Button ID="Button3" runat="server" Text="등록" OnClick="btnSkills_Click" 
+                                    CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
+                            <br /><br />
+
+                            <div>
+                                <asp:TextBox ID="TextBox8" runat="server" Width="50"></asp:TextBox>
+                                <asp:Label ID="Label5" runat="server" Text="년" ForeColor="Gray"></asp:Label> &nbsp;
+                                <asp:TextBox ID="TextBox9" runat="server" Width="30"></asp:TextBox>
+                                <asp:Label ID="Label6" runat="server" Text="월  입사" ForeColor="Gray"></asp:Label>
+                                &nbsp; <a style="color:gray;">~</a> &nbsp;
+                                <asp:TextBox ID="TextBox10" runat="server" Width="50"></asp:TextBox>
+                                <asp:Label ID="Label7" runat="server" Text="년" ForeColor="Gray"></asp:Label> &nbsp;
+                                <asp:TextBox ID="TextBox11" runat="server" Width="30"></asp:TextBox>
+                                <asp:Label ID="Label8" runat="server" Text="월  퇴사" ForeColor="Gray"></asp:Label>
+                            </div><br />
+
+                            <asp:TextBox ID="TextBox12" runat="server" placeholder="직무 내용을 입력해 주세요." TextMode="MultiLine" style="width:100%; height:250px; padding-left:5px;"></asp:TextBox>
+                            <br /><br />
+                        </asp:Panel>
+
                     </div>
                     
-                    <div class="w3-container w3-card w3-white w3-margin-bottom">
+                    <!-- <div class="w3-container w3-card w3-white w3-margin-bottom">
                         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-graduation-cap fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Education</h2>
                         <div class="w3-container">
                             <h5 class="w3-opacity"><b>유한대학교</b></h5>
@@ -463,7 +548,7 @@
                                 참고) https://store.whale.naver.com/detail/mpbohbjpccagbpimcagchhfibnmcngak
                             </p>
                         </div><br/>
-                    </div>
+                    </div>-->
 
                 </div>
             </div>

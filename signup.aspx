@@ -39,6 +39,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
     <title></title>
     <style>
         .btn-submit {
@@ -53,13 +57,13 @@
           border: none;
           background-image: linear-gradient(to left, #74ebd5, #9face6);
         }
-        
-        .post-input{padding:8px;width:30%;margin-top:0px;}
-        .post-btn{border-radius:5px; padding:8px;border:none;width:10%;margin-top:0px;}
+        .post-input{
+            padding:8px;width:30%;margin-top:0px;
+        }
+        .post-btn{
+            border-radius:5px; padding:8px;border:none;width:10%;margin-top:0px;
+        }
     </style>
-
-	<link rel="stylesheet" type="text/css" href="./res/css/w3.css"/>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <script src="//d1p7wdleee1q2z.cloudfront.net/post/search.min.js"></script>

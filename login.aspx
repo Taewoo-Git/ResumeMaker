@@ -48,11 +48,15 @@
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<link rel="stylesheet" type="text/css" href="./res/css/w3.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet"/>
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Righteous&display=swap"/>
+
     <title></title>
     <style>
-        .font-righteous {font-family: 'Righteous', cursive;}
+        .font-righteous {
+            font-family: 'Righteous', cursive;
+        }
     </style>
 </head>
 <body>
