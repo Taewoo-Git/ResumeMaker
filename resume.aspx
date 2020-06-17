@@ -4,34 +4,91 @@
 <!DOCTYPE html>
 
 <script runat="server">
-    // SqlConnection 개체 생성
-    SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
-            "Integrated Security=False; uid=taewoo; pwd=1111");
+
+    SqlConnection con;
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        //Response.Write(Session["usersession"]);
         string email = Request.QueryString["useremail"];
+        if (string.IsNullOrEmpty(email)) Response.Redirect("login.aspx");
 
-        selectProfile(email);
+        con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
+            "Integrated Security=False; uid=taewoo; pwd=1111");
 
-        // 이미지 버튼 클릭 이벤트 추가
-        ImageButton1.Attributes.Add("onclick", "document.getElementById('FileUpload1').click(); return false;");
+        string myip = Request.UserHostAddress;
+
+        if (string.IsNullOrEmpty(Session[myip + "/" + email] as string))
+        {
+            updateView(email);
+            Session[myip + "/" + email] = "Y";
+        }
+
+        if (string.IsNullOrEmpty(Session["usersession"] as string) || (Session["usersession"] as string).Equals("none"))
+        {
+            Session["usersession"] = "none";
+            btnSignout.Text = "Sign in";
+        }
+
+        if (Session["usersession"].Equals(email))
+        {
+            panOwner.Visible = true;
+            panOther.Visible = false;
+
+            btnProfile.Visible = true;
+            btnCerti.Visible = true;
+            btnSkills.Visible = true;
+
+            btnWorkAdd.Visible = true;
+            btnWorkEdit.Visible = true;
+            btnEduAdd.Visible = true;
+            btnEduEdit.Visible = true;
+            btnAwardsAdd.Visible = true;
+            btnAwardsEdit.Visible = true;
+
+            btnProfileImg.Attributes.Add("onclick", "document.getElementById('fileProfileImg').click(); return false;");
+        }
+        else
+        {
+            panOwner.Visible = false;
+            panOther.Visible = true;
+
+            btnProfileImg.Attributes.Add("disabled", "true");
+        }
+
+        btnProfileImg.ImageUrl = "~/res/img/profile.png";
+
+        if(fileProfileImg.HasFile)
+        {
+            string filePath = Server.MapPath("~/res/img/" + email + "/");
+
+            if(System.IO.Directory.Exists(filePath))
+            {
+                fileProfileImg.PostedFile.SaveAs(filePath + fileProfileImg.PostedFile.FileName);
+            }
+            else
+            {
+                System.IO.Directory.CreateDirectory(filePath);
+                fileProfileImg.PostedFile.SaveAs(filePath + fileProfileImg.PostedFile.FileName);
+            }
+
+            updateFile(email, fileProfileImg.PostedFile.FileName);
+        }
+
+        initProfile(email);
+        countStars(email);
+        checkStars(email);
+
+        Page.Title = lblPageTitle.Text;
     }
 
-    protected void selectProfile(string email)
+    protected void initProfile(string email)
     {
-        // SqlCommand 개체 생성
         string sql = "SELECT * FROM Member WHERE email='" + email + "'";
         SqlCommand cmd = new SqlCommand(sql, con);
 
-        // SqlConnection 개체 열기
         con.Open();
-
-        // SqlDataReader 개체 생성
         SqlDataReader rd = cmd.ExecuteReader();
 
-        // 데이터 조회 및 출력
         if (rd.Read())
         {
             lblName.Text = String.Format("{0}", rd["name"]);
@@ -40,6 +97,16 @@
             lblEmail.Text = String.Format("{0}", rd["email"]);
             lblPhone.Text = String.Format("{0}", rd["phone"]);
             lblGithub.Text = String.Format("{0}", rd["github"]);
+
+            if (String.Format("{0}", rd["img"]).Length != 0) btnProfileImg.ImageUrl = String.Format("{0}", rd["img"]);
+
+            lblPageTitle.Text = String.Format("{0}'s Resume", rd["name"]);
+
+            lblView.Text = String.Format("{0}", rd["viewer"]);
+            if (String.Format("{0}", rd["shared"]).Equals("Y")) btnShare.Text = "Unshare";
+            else btnShare.Text = "Share";
+
+            if(String.Format("{0}", rd["img"]).Length > 0) btnProfileImg.ImageUrl = "~/res/img/" + email + "/" + String.Format("{0}", rd["img"]);
         }
 
         if(lblGithub.Text.Length == 0)
@@ -47,8 +114,59 @@
             panLabelGithub.Visible = false;
         }
 
-        //SqlDataReader 및 SqlConnection 개체 닫기
         rd.Close();
+        con.Close();
+    }
+
+    protected void updateView(string email)
+    {
+        string sql = "UPDATE Member SET viewer = viewer + 1 WHERE email = @email";
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        cmd.Parameters.AddWithValue("@email", email);
+
+        con.Open();
+        cmd.ExecuteNonQuery();
+        con.Close();
+    }
+
+    protected void countStars(string email)
+    {
+        int count;
+        string sql = "SELECT count(*) FROM Stars WHERE email = @email";
+        SqlCommand cmd = new SqlCommand(sql, con);
+        cmd.Parameters.AddWithValue("@email", email);
+
+        con.Open();
+        count  = (int)cmd.ExecuteScalar();
+        lblStar.Text = count.ToString();
+
+        con.Close();
+    }
+
+    protected void checkStars(string email)
+    {
+        string sql = "SELECT count(*) FROM Stars WHERE email = @email AND recommender = @recommender";
+        SqlCommand cmd = new SqlCommand(sql, con);
+        cmd.Parameters.AddWithValue("@email", email);
+        cmd.Parameters.AddWithValue("@recommender", Session["usersession"]);
+
+        con.Open();
+        if (((int)cmd.ExecuteScalar()) == 1) btnRecommend.Text = "Unrecommend";
+        else btnRecommend.Text = "Recommend";
+        con.Close();
+    }
+
+    protected void updateFile(string email, string filename)
+    {
+        string sql = "UPDATE Member SET img = @img WHERE email = @email";
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        cmd.Parameters.AddWithValue("@img", filename);
+        cmd.Parameters.AddWithValue("@email", email);
+
+        con.Open();
+        cmd.ExecuteNonQuery();
         con.Close();
     }
 
@@ -109,16 +227,16 @@
 
     protected void btnCerti_Click(object sender, EventArgs e)
     {
-        if (!tbCertiFix.Visible)
+        if (!tbCertiEdit.Visible)
         {
             btnCerti.Text = "취소";
-            tbCertiFix.Visible = true;
+            tbCertiEdit.Visible = true;
             gvCerti.Columns[4].Visible = true;
         }
         else
         {
             btnCerti.Text = "수정";
-            tbCertiFix.Visible = false;
+            tbCertiEdit.Visible = false;
             gvCerti.Columns[4].Visible = false;
         }
     }
@@ -569,18 +687,78 @@
         btnAwardsAdd.Text = "추가";
         panAddAwards.Visible = false;
     }
+
+    protected void btnShare_Click(object sender, EventArgs e)
+    {
+        string sql;
+
+        if(btnShare.Text.Equals("Share")) sql = "UPDATE Member SET shared = 'Y' WHERE email = @email";
+        else sql = "UPDATE Member SET shared = 'N' WHERE email = @email";
+
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+
+        con.Open();
+        cmd.ExecuteNonQuery();
+        con.Close();
+
+        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+    }
+
+    protected void btnRecommend_Click(object sender, EventArgs e)
+    {
+        if (!Session["usersession"].Equals("none"))
+        {
+            string sql;
+
+            if(btnRecommend.Text.Equals("Recommend"))
+            {
+                btnRecommend.Text = "Unrecommend";
+                sql = "INSERT INTO Stars(email, recommender) VALUES(@email, @recommender)";
+            }
+            else
+            {
+                btnRecommend.Text = "Recommend";
+                sql = "DELETE FROM Stars WHERE email = @email AND recommender = @recommender";
+            }
+            SqlCommand cmd = new SqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+            cmd.Parameters.AddWithValue("@recommender", Session["usersession"]);
+
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+
+            Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+        }
+        else
+        {
+            ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert('추천은 회원만 가능합니다.')", true);
+        }
+    }
+
+    protected void btnSignout_Click(object sender, EventArgs e)
+    {
+        Session["usersession"] = null;
+        Response.Redirect("login.aspx");
+    }
+
+    protected void btnExplore_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("explore.aspx");
+    }
 </script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 
-    <title>이력서 만들기</title>
     <style>
         html, body {
             font-family: "Roboto", sans-serif
@@ -613,15 +791,15 @@
         input[type=range]:focus::-webkit-slider-runnable-track {
             background: #009688;
         }
-        .range-wrap{
+        .range-wrap {
             width: 100%;
             position: relative;
         }
-        .range-value{
+        .range-value {
             position: absolute;
             top: -50%;
         }
-        .range-value span{
+        .range-value span {
             width: 30px;
             height: 24px;
             line-height: 24px;
@@ -635,7 +813,7 @@
             transform: translate(-50%, 0);
             border-radius: 6px;
         }
-        .range-value span:before{
+        .range-value span:before {
             content: "";
             position: absolute;
             width: 0;
@@ -648,7 +826,13 @@
             margin-left: -5px;
             margin-top: -1px;
         }
+        #lblPageTitle {
+            position:absolute;
+            margin-top:7px;
+            margin-left:-200px;
+        }
     </style>
+
     <script type="text/javascript">
         function show_calendar() {
             var cal = document.getElementById("calendar");
@@ -662,11 +846,28 @@
             return false;
         }
     </script>
+    <title></title>
 </head>
 <body class="w3-light-grey">
     <form id="form1" runat="server">
-        <header class="w3-container w3-teal w3-center w3-margin-bottom">
-          <p></p>
+        <header class="w3-container w3-teal w3-center w3-margin-bottom w3-padding-small">
+            <i class="fa fa-eye fa-fw w3-text-white w3-large w3-left" style="margin-left:80px; margin-top:10px;"></i>
+            <asp:Label ID="lblView" runat="server" Text="" CssClass="w3-text-wthie w3-large w3-left" style="margin-left:8px; margin-top:7px;"></asp:Label>
+            <i class="fa fa-star fa-fw w3-text-white w3-large w3-left" style="margin-left:30px; margin-top:10px;"></i>
+            <asp:Label ID="lblStar" runat="server" Text="" CssClass="w3-text-wthie w3-large w3-left" style="margin-left:8px; margin-top:7px;"></asp:Label>
+
+            <asp:Label ID="lblPageTitle" runat="server" CssClass="w3-text-wthie w3-large" Font-Bold="true"></asp:Label>
+            
+            <asp:Button ID="btnSignout" runat="server" Text="Sign out" CssClass="w3-button w3-red w3-round w3-right" style="margin-right:80px;" OnClick="btnSignout_Click"/>
+            <asp:Button ID="btnExplore" runat="server" Text="Explore" CssClass="w3-button w3-white w3-round w3-right" style="margin-right:8px;" OnClick="btnExplore_Click"/>
+
+            <asp:Panel ID="panOwner" runat="server" Visible="false">
+                <asp:Button ID="btnShare" runat="server" Text="Share" CssClass="w3-button w3-white w3-round w3-right" style="margin-right:8px;" OnClick="btnShare_Click"/>
+            </asp:Panel>
+
+            <asp:Panel ID="panOther" runat="server" Visible="true">
+                <asp:Button ID="btnRecommend" runat="server" Text="Recommend" CssClass="w3-button w3-white w3-round w3-right" style="margin-right:8px;" OnClick="btnRecommend_Click"/>
+            </asp:Panel>
         </header>
 
         <div class="w3-content w3-margin-top" style="max-width: 1400px;">
@@ -675,11 +876,11 @@
                 <div class="w3-third">
                     <div class="w3-white w3-text-grey w3-card-4">
                         <div class="w3-display-container">
-                            <input type="file" accept="image/jpeg, image/png" id="FileUpload1" hidden="hidden"/>
-                            <asp:ImageButton ID="ImageButton1" runat="server" src="./res/img/profile.png"
-                                style="width:100%; height: 300px; overflow: hidden;"/>
+                            <asp:FileUpload ID="fileProfileImg" runat="server" accept="image/jpeg, image/png" hidden="hidden" onchange="this.form.submit()"/>
+                            <asp:ImageButton ID="btnProfileImg" runat="server" style="width:100%; height: 300px; overflow: hidden;" AlternateText="프로필 사진"/>
 
-                            <asp:Button ID="btnProfile" runat="server" Text="수정" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:15px; margin-right:20px;" OnClick="btnProfile_Click"/>
+                            <asp:Button ID="btnProfile" runat="server" Text="수정" Visible="false" OnClick="btnProfile_Click"
+                                CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:15px; margin-right:20px;"/>
                             <asp:TextBox ID="txtName" runat="server" Visible="false" CssClass="w3-margin-left" style="width:75%; height:30px; margin-top:15px;" placeholder="이름" Font-Size="Medium"></asp:TextBox>
                             <h2 style="margin-bottom: 0px"><asp:Label ID="lblName" runat="server" CssClass="w3-margin-left" Text="이름" Font-Bold="true"/></h2>
                         </div>
@@ -714,8 +915,9 @@
                             </asp:Panel>
                             <hr/>
 
-                            <p class="w3-large w3-text-theme"><b><i class="fa fa-certificate fa-fw w3-margin-right w3-text-teal"></i>Certificate</b></p>
-                            <asp:Button ID="btnCerti" runat="server" Text="수정" CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-50px; margin-right:2.5px;" OnClick="btnCerti_Click" />
+                            <p class="w3-large w3-text-theme"><b><i class="fa fa-address-card-o fa-fw w3-margin-right w3-text-teal"></i>Certificate</b></p>
+                            <asp:Button ID="btnCerti" runat="server" Text="수정" Visible="false" OnClick="btnCerti_Click"
+                                CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-50px; margin-right:2.5px;"/>
                             
                             <asp:GridView ID="gvCerti" runat="server" AutoGenerateColumns="False" DataSourceID="SqlDataSource1" OnRowDeleted="gvCerti_RowDeleted"
                                 Height="35px" Width="100%" BorderStyle="None" BorderColor="White" ShowHeader="false" DataKeyNames="num" >
@@ -748,7 +950,7 @@
                                 </DeleteParameters>
                             </asp:SqlDataSource>
 
-                            <asp:Table ID="tbCertiFix" runat="server" Visible="false">
+                            <asp:Table ID="tbCertiEdit" runat="server" Visible="false">
                                 <asp:TableRow Height="35px" VerticalAlign="Top">
                                     <asp:TableCell Width="132">
                                         <div style="border: 1px solid #A6A6A6; height: 28.5px; padding-left:5px;">
@@ -770,7 +972,7 @@
                             <hr/>
                             
                             <p class="w3-large w3-text-theme"><b><i class="fa fa-sliders fa-fw w3-margin-right w3-text-teal"></i>Skills</b></p>
-                            <asp:Button ID="btnSkills" runat="server" Text="수정" OnClick="btnSkills_Click" 
+                            <asp:Button ID="btnSkills" runat="server" Text="수정" Visible="false" OnClick="btnSkills_Click" 
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-50px; margin-right:2.5px;" />
 
                             <asp:DataList ID="dlSkills" runat="server" DataSourceID="SqlDataSource2" ItemStyle-Width="430px">
@@ -809,9 +1011,9 @@
                 <div class="w3-twothird">
                     <div class="w3-container w3-card w3-white w3-margin-bottom">
                         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Work Experience</h2>
-                        <asp:Button ID="btnWorkAdd" runat="server" Text="추가" OnClick="btnWorkAdd_Click" 
+                        <asp:Button ID="btnWorkAdd" runat="server" Text="추가" Visible="false" OnClick="btnWorkAdd_Click" 
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:2.5px;" />
-                        <asp:Button ID="btnWorkEdit" runat="server" Text="수정" OnClick="btnWorkEdit_Click" 
+                        <asp:Button ID="btnWorkEdit" runat="server" Text="수정" Visible="false" OnClick="btnWorkEdit_Click" 
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
                         <asp:ListView ID="lvWork" runat="server" DataSourceID="SqlDataSource3" OnPagePropertiesChanged="lvWork_PagePropertiesChanged">
@@ -899,10 +1101,10 @@
                     </div>
 
                     <div class="w3-container w3-card w3-white w3-margin-bottom">
-                        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Education</h2>
-                        <asp:Button ID="btnEduAdd" runat="server" Text="추가" OnClick="btnEduAdd_Click" 
+                        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-graduation-cap fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Education</h2>
+                        <asp:Button ID="btnEduAdd" runat="server" Text="추가" Visible="false" OnClick="btnEduAdd_Click" 
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:2.5px;" />
-                        <asp:Button ID="btnEduEdit" runat="server" Text="수정" OnClick="btnEduEdit_Click" 
+                        <asp:Button ID="btnEduEdit" runat="server" Text="수정" Visible="false" OnClick="btnEduEdit_Click" 
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
                         <asp:ListView ID="lvEdu" runat="server" DataSourceID="SqlDataSource4" OnPagePropertiesChanged="lvEdu_PagePropertiesChanged">
@@ -990,10 +1192,10 @@
                     </div>
 
                     <div class="w3-container w3-card w3-white w3-margin-bottom">
-                        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Awards</h2>
-                        <asp:Button ID="btnAwardsAdd" runat="server" Text="추가" OnClick="btnAwardsAdd_Click" 
+                        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-trophy fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Awards</h2>
+                        <asp:Button ID="btnAwardsAdd" runat="server" Text="추가" Visible="false" OnClick="btnAwardsAdd_Click" 
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:2.5px;" />
-                        <asp:Button ID="btnAwardsEdit" runat="server" Text="수정" OnClick="btnAwardsEdit_Click" 
+                        <asp:Button ID="btnAwardsEdit" runat="server" Text="수정" Visible="false" OnClick="btnAwardsEdit_Click" 
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
                         <asp:ListView ID="lvAwards" runat="server" DataSourceID="SqlDataSource5" OnPagePropertiesChanged="lvAwards_PagePropertiesChanged">
@@ -1084,8 +1286,8 @@
             </div>
         </div>
 
-        <footer class="w3-container w3-teal w3-center w3-margin-top">
-          <p></p>
+        <footer class="w3-container w3-teal w3-center w3-margin-top" style="padding:10px;">
+            <asp:Label ID="lblFooter" runat="server" Text="Powered by ResumeMaker" CssClass="w3-text-white"></asp:Label>
         </footer>
     </form>
 
@@ -1094,18 +1296,6 @@
         for (element of valSkills) {
             element.style.width = element.innerText;
         }
-
-        document.getElementById("FileUpload1").onchange = function () {
-            let img = this.files[0];
-            if (img) {
-                var fr = new FileReader();
-                fr.onload = function () {
-                    var result = fr.result;
-                    document.getElementById("ImageButton1").src = result;
-                };
-                fr.readAsDataURL(img);
-            }
-        };
 
         const
             range = document.getElementById('skillsRange'),

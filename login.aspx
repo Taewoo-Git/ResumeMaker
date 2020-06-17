@@ -4,6 +4,13 @@
 <!DOCTYPE html>
 
 <script runat="server">
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!string.IsNullOrEmpty(Session["usersession"] as string) && !Session["usersession"].Equals("none"))
+        {
+            Response.Redirect("resume.aspx?useremail=" + Session["usersession"]);
+        }
+    }
     protected void btnLogin_Click(object sender, EventArgs e)
     {
         if(Page.IsValid)
@@ -48,16 +55,15 @@
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Righteous&display=swap"/>
 
-    <title></title>
     <style>
         .font-righteous {
             font-family: 'Righteous', cursive;
         }
     </style>
+    <title>Resume Maker</title>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -86,7 +92,7 @@
                             <br />
                             <asp:Button ID="btnLogin" runat="server" class="w3-button w3-block w3-teal w3-padding" Text="Login" OnClick="btnLogin_Click" OnClientClick="initLabel()"/>
                             <input type="button" class="w3-button w3-margin-top w3-light-grey" value="Sign up" onclick="btnSignup_Click()" />
-                            <span class="w3-right w3-padding w3-margin-top"><a href="./resume.aspx?useremail=none">비회원으로 접속</a></span>
+                            <span class="w3-right w3-padding w3-margin-top"><a href="./explore.aspx">비회원으로 둘러보기</a></span>
                         </div>
                     </div>
                 </div>
