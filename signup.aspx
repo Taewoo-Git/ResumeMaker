@@ -29,7 +29,7 @@
         cmd.Parameters.AddWithValue("@github", txtGithub.Text);
         cmd.Parameters.AddWithValue("@viewer", 0);
         cmd.Parameters.AddWithValue("@shared", 'N');
-        cmd.Parameters.AddWithValue("@img", 'profile.png');
+        cmd.Parameters.AddWithValue("@img", "profile.png");
 
         con.Open();
         cmd.ExecuteNonQuery();
