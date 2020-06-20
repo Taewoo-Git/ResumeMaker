@@ -16,25 +16,28 @@
     <form id="form1" runat="server">
         <div class="w3-container w3-content w3-card w3-white w3-margin-top w3-round-large" style="max-width:600px;">
             <div class="w3-section">
-                <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" DataKeyNames="email" DataSourceID="SqlDataSource1" Width="100%">
+                <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" DataKeyNames="email" DataSourceID="SqlDataSource1" Width="100%"
+                    HeaderStyle-CssClass="w3-teal w3-padding-small" BorderColor="White">
                     <Columns>
-                        <asp:BoundField DataField="email" HeaderText="Email" ReadOnly="True" SortExpression="email" ItemStyle-HorizontalAlign="Center">
-<ItemStyle HorizontalAlign="Center"></ItemStyle>
-                        </asp:BoundField>
-                        <asp:BoundField DataField="name" HeaderText="Name" SortExpression="name" ItemStyle-HorizontalAlign="Center">
-<ItemStyle HorizontalAlign="Center"></ItemStyle>
-                        </asp:BoundField>
+                        <asp:TemplateField HeaderText="Resume" ItemStyle-HorizontalAlign="Center">
+                            <ItemTemplate>
+                                <a href='resume.aspx?useremail=<%# Eval("email") %>'><%# Eval("name") %>(<%# Eval("email") %>)님의 이력서</a>
+                            </ItemTemplate>
+                        </asp:TemplateField>
                         <asp:BoundField DataField="viewer" HeaderText="Views" SortExpression="viewer" ItemStyle-HorizontalAlign="Center">
-<ItemStyle HorizontalAlign="Center"></ItemStyle>
                         </asp:BoundField>
-                        <asp:TemplateField HeaderText="Hits"></asp:TemplateField>
+                        <asp:BoundField DataField="stars" HeaderText="Stars" ReadOnly="True" SortExpression="stars" ItemStyle-HorizontalAlign="Center">
+                        </asp:BoundField>
+                        <asp:ButtonField ButtonType="Button" CommandName="Delete" HeaderText="" ShowHeader="True" Text="탈퇴"
+                            ItemStyle-HorizontalAlign="Center" ControlStyle-CssClass="w3-button w3-red w3-padding-small"/>
                     </Columns>
                 </asp:GridView>
                 <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:resume_maker_dbConnectionString %>"
-                    SelectCommand="SELECT [email], [name], [viewer] FROM [Member] WHERE ([shared] = @shared)">
-                    <SelectParameters>
-                        <asp:Parameter DefaultValue="Y" Name="shared" Type="String" />
-                    </SelectParameters>
+                    SelectCommand="SELECT m.email, m.name, m.viewer, (select count(num) from Stars where email=m.email) as 'stars' FROM Member m;"
+                    DeleteCommand="DELETE FROM Member WHERE email = @email">
+                    <DeleteParameters>
+                        <asp:Parameter Name="email" Type="String" />
+                    </DeleteParameters>
                 </asp:SqlDataSource>
             </div>
         </div>
