@@ -13,41 +13,49 @@
     }
     protected void btnLogin_Click(object sender, EventArgs e)
     {
+        string email = txtEmail.Text;
+        string pwd = txtPwd.Text;
+
         if(Page.IsValid)
         {
             lblDeny.Text = "이메일 또는 패스워드가 틀렸습니다.";
         }
 
-        string email = txtEmail.Text;
-        string pwd = txtPwd.Text;
-
-        // SqlConnection 개체 생성
-        SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
-        "Integrated Security=False; uid=taewoo; pwd=1111");
-
-        // SqlCommand 개체 생성
-        string sql = "SELECT pwd FROM Member WHERE email='" + email + "'";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        // SqlConnection 개체 열기
-        con.Open();
-
-        // SqlDataReader 개체 생성
-        SqlDataReader rd = cmd.ExecuteReader();
-
-        // 데이터 조회
-        if (rd.Read())
+        if(email.Equals("admin") && pwd.Equals("admin"))
         {
-            if (pwd == String.Format("{0}", rd["pwd"]))
-            {
-                Session["usersession"] = email;
-                Response.Redirect("resume.aspx?useremail=" + email);
-            }
+            Session["usersession"] = email;
+            Response.Redirect("explore.aspx");
         }
+        else
+        {
+            // SqlConnection 개체 생성
+            SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
+            "Integrated Security=False; uid=taewoo; pwd=1111");
 
-        //SqlDataReader 및 SqlConnection 개체 닫기
-        rd.Close();
-        con.Close();
+            // SqlCommand 개체 생성
+            string sql = "SELECT pwd FROM Member WHERE email='" + email + "'";
+            SqlCommand cmd = new SqlCommand(sql, con);
+
+            // SqlConnection 개체 열기
+            con.Open();
+
+            // SqlDataReader 개체 생성
+            SqlDataReader rd = cmd.ExecuteReader();
+
+            // 데이터 조회
+            if (rd.Read())
+            {
+                if (pwd == String.Format("{0}", rd["pwd"]))
+                {
+                    Session["usersession"] = email;
+                    Response.Redirect("resume.aspx?useremail=" + email);
+                }
+            }
+
+            //SqlDataReader 및 SqlConnection 개체 닫기
+            rd.Close();
+            con.Close();
+        }
     }
 </script>
 
@@ -68,7 +76,7 @@
 <body>
     <form id="form1" runat="server">
         <div class="w3-container">
-            <div id="id01" class="w3-modal">
+            <div id="modal" class="w3-modal">
                 <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:400px; height: 510px">
                     
                     <div class="w3-container w3-teal">
@@ -101,10 +109,10 @@
     </form>
 
     <script type="text/javascript">
-        document.getElementById('id01').style.display = 'block';
+        document.getElementById('modal').style.display = 'block';
 
         function initLabel() {
-            document.getElementById('Label1').innerHTML = "";
+            document.getElementById('lblDeny').innerHTML = "";
         }
 
         function btnSignup_Click() {

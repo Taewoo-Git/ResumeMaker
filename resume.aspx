@@ -891,10 +891,10 @@
                                 <asp:Label ID="lblEmail" runat="server" Text="이메일"/></p>
                             <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>
                                 <asp:DropDownList ID="listJob" runat="server" Visible="false" CssClass="w3-select" style="width:70%; margin-top:0px;">
-                                    <asp:ListItem>Front-End</asp:ListItem>
-                                    <asp:ListItem>Back-End</asp:ListItem>
-                                    <asp:ListItem>Full Stack</asp:ListItem>
-                                    <asp:ListItem>DBA</asp:ListItem>
+                                    <asp:ListItem>Developer</asp:ListItem>
+                                    <asp:ListItem>Engineer</asp:ListItem>
+                                    <asp:ListItem>Analyst</asp:ListItem>
+                                    <asp:ListItem>Architect</asp:ListItem>
                                     <asp:ListItem>Designer</asp:ListItem>
                                 </asp:DropDownList>
                                 <asp:Label ID="lblJob" runat="server" Text="직업"/></p>
