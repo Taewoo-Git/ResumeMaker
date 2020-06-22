@@ -27,7 +27,7 @@
             <div class="w3-container w3-content w3-card w3-white w3-margin-top w3-round-large" style="max-width:600px;">
                 <div class="w3-section">
                     <asp:GridView ID="gvExplore" runat="server" AutoGenerateColumns="False" DataKeyNames="email" DataSourceID="SqlDataSource1" Width="100%"
-                        HeaderStyle-CssClass="w3-teal w3-padding-small" BorderColor="White">
+                        HeaderStyle-CssClass="w3-teal w3-padding-small" BorderColor="White" RowStyle-Height="35px">
                         <Columns>
                             <asp:TemplateField HeaderText="Resume" ItemStyle-HorizontalAlign="Center">
                                 <ItemTemplate>

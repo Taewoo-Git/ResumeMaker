@@ -4,8 +4,6 @@
 <!DOCTYPE html>
 
 <script runat="server">
-    bool duplication = false;
-
     protected void Page_Load(object sender, EventArgs e)
     {
         txtZip.Attributes.Add("readonly", "readonly");
@@ -14,13 +12,13 @@
 
     protected void btnSignup_Click(object sender, EventArgs e)
     {
-        if(duplication)
+        if(!txtEmail.Enabled)
         {
             SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
             "Integrated Security=False; uid=taewoo; pwd=1111");
 
-            string sql = "INSERT INTO Member(email, pwd, name, phone, zip, addr, job, github, viewer, shared, img) " +
-                    "VALUES(@email, @pwd, @name, @phone, @zip, @addr, @job, @github, @viewer, @shared, @img)";
+            string sql = "INSERT INTO Member(email, pwd, name, phone, zip, addr, job, github, viewer, shared) " +
+                    "VALUES(@email, @pwd, @name, @phone, @zip, @addr, @job, @github, @viewer, @shared)";
 
             SqlCommand cmd = new SqlCommand(sql, con);
             cmd.Parameters.AddWithValue("@email", txtEmail.Text);
@@ -29,16 +27,13 @@
             cmd.Parameters.AddWithValue("@phone", txtPhone.Text);
             cmd.Parameters.AddWithValue("@zip", txtZip.Text);
             cmd.Parameters.AddWithValue("@addr", txtAddr.Text);
-
-            if (!listJob.SelectedValue.Equals("직업")) cmd.Parameters.AddWithValue("@job", listJob.SelectedValue);
-            else cmd.Parameters.AddWithValue("@job", null);
+            cmd.Parameters.AddWithValue("@job", listJob.SelectedValue);
 
             if(txtGithub.Text.Length > 0) cmd.Parameters.AddWithValue("@github", txtGithub.Text);
-            else cmd.Parameters.AddWithValue("@github", null);
+            else cmd.Parameters.AddWithValue("@github", DBNull.Value);
 
             cmd.Parameters.AddWithValue("@viewer", 0);
             cmd.Parameters.AddWithValue("@shared", 'N');
-            cmd.Parameters.AddWithValue("@img", "profile.png");
 
             con.Open();
             cmd.ExecuteNonQuery();
@@ -66,7 +61,6 @@
         if (((int)cmd.ExecuteScalar()) > 0)
         {
             ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert('이미 가입된 이메일입니다.')", true);
-            duplication = false;
         }
         else
         {
@@ -75,14 +69,12 @@
                 ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert('사용 가능한 이메일입니다.')", true);
                 txtEmail.Enabled = false;
                 btnEmail.Text = "다시입력";
-                duplication = true;
             }
             else
             {
                 txtEmail.Text = "";
                 txtEmail.Enabled = true;
                 btnEmail.Text = "중복검사";
-                duplication = false;
             }
         }
         con.Close();

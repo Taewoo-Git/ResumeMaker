@@ -39,11 +39,11 @@
             btnSkills.Visible = true;
 
             btnWorkAdd.Visible = true;
-            btnWorkEdit.Visible = true;
+            if(lvWork.Controls.Count > 0) btnWorkEdit.Visible = true;
             btnEduAdd.Visible = true;
-            btnEduEdit.Visible = true;
+            if(lvEdu.Controls.Count > 0) btnEduEdit.Visible = true;
             btnAwardsAdd.Visible = true;
-            btnAwardsEdit.Visible = true;
+            if(lvAwards.Controls.Count > 0) btnAwardsEdit.Visible = true;
 
             btnProfileImg.Attributes.Add("onclick", "document.getElementById('fileProfileImg').click(); return false;");
         }
@@ -1013,7 +1013,7 @@
                         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Work Experience</h2>
                         <asp:Button ID="btnWorkAdd" runat="server" Text="추가" Visible="false" OnClick="btnWorkAdd_Click" 
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:2.5px;" />
-                        <asp:Button ID="btnWorkEdit" runat="server" Text="수정" Visible="false" OnClick="btnWorkEdit_Click" 
+                        <asp:Button ID="btnWorkEdit" runat="server" Text="수정" Visible="false" OnClick="btnWorkEdit_Click"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
                         <asp:ListView ID="lvWork" runat="server" DataSourceID="SqlDataSource3" OnPagePropertiesChanged="lvWork_PagePropertiesChanged">
