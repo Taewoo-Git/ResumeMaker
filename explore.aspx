@@ -1,5 +1,6 @@
 ﻿<%@ Page Language="C#" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="System.Data" %>
 
 <!DOCTYPE html>
 
@@ -9,6 +10,7 @@
         if (!string.IsNullOrEmpty(Session["usersession"] as string) && Session["usersession"].Equals("admin"))
         {
             gvExplore.Columns[3].Visible = true;
+            SqlDataSource1.SelectCommand = "SELECT m.email, m.name, m.viewer, (select count(num) from Stars where email=m.email) as 'stars' FROM Member m;";
         }
     }
 </script>
