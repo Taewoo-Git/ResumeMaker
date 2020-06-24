@@ -331,50 +331,6 @@
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 
-    protected void btnWorkAdd_Click(object sender, EventArgs e)
-    {
-        if(!panAddWork.Visible)
-        {
-            btnWorkAdd.Text = "취소";
-            panAddWork.Visible = true;
-
-            btnWorkEdit.Text = "수정";
-            panEditWork.Visible = false;
-        }
-        else
-        {
-            btnWorkAdd.Text = "추가";
-            panAddWork.Visible = false;
-        }
-    }
-
-    protected void btnWorkEdit_Click(object sender, EventArgs e)
-    {
-        if(!panEditWork.Visible)
-        {
-            btnWorkEdit.Text = "취소";
-            panEditWork.Visible = true;
-
-            btnWorkAdd.Text = "추가";
-            panAddWork.Visible = false;
-
-            String[] joinDate = ((Label)lvWork.Items[0].FindControl("lblWorkJoinDate")).Text.Split('년');
-            String[] leaveDate = ((Label)lvWork.Items[0].FindControl("lblWorkLeaveDate")).Text.Split('년');
-
-            txtEditWorkTitle.Text = ((Label) lvWork.Items[0].FindControl("lblWorkTitle")).Text;
-            txtEditWorkJoinYear.Text = joinDate[0];
-            txtEditWorkJoinMonth.Text = joinDate[1].TrimEnd('월').TrimStart(' ');
-            txtEditWorkLeaveYear.Text = leaveDate[0];
-            txtEditWorkLeaveMonth.Text = leaveDate[1].TrimEnd('월').TrimStart(' ');
-            txtEditWorkContents.Text = ((Label) lvWork.Items[0].FindControl("lblWorkContents")).Text.ToString().Replace("<br />", "\n");
-        }
-        else
-        {
-            btnWorkEdit.Text = "수정";
-            panEditWork.Visible = false;
-        }
-    }
-
     protected void btnInsertWork_Click(object sender, EventArgs e)
     {
         string WorkJoinDate = txtWorkJoinYear.Text.ToString() + "년 " + txtWorkJoinMonth.Text.ToString() + "월";
@@ -441,50 +397,6 @@
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 
-    protected void btnEduAdd_Click(object sender, EventArgs e)
-    {
-        if(!panAddEdu.Visible)
-        {
-            btnEduAdd.Text = "취소";
-            panAddEdu.Visible = true;
-
-            btnEduEdit.Text = "수정";
-            panEditEdu.Visible = false;
-        }
-        else
-        {
-            btnEduAdd.Text = "추가";
-            panAddEdu.Visible = false;
-        }
-    }
-
-    protected void btnEduEdit_Click(object sender, EventArgs e)
-    {
-        if(!panEditEdu.Visible)
-        {
-            btnEduEdit.Text = "취소";
-            panEditEdu.Visible = true;
-
-            btnEduAdd.Text = "추가";
-            panAddEdu.Visible = false;
-
-            String[] joinDate = ((Label)lvEdu.Items[0].FindControl("lblEduJoinDate")).Text.Split('년');
-            String[] leaveDate = ((Label)lvEdu.Items[0].FindControl("lblEduLeaveDate")).Text.Split('년');
-
-            txtEditEduTitle.Text = ((Label) lvEdu.Items[0].FindControl("lblEduTitle")).Text;
-            txtEditEduJoinYear.Text = joinDate[0];
-            txtEditEduJoinMonth.Text = joinDate[1].TrimEnd('월').TrimStart(' ');
-            txtEditEduLeaveYear.Text = leaveDate[0];
-            txtEditEduLeaveMonth.Text = leaveDate[1].TrimEnd('월').TrimStart(' ');
-            txtEditEduContents.Text = ((Label) lvEdu.Items[0].FindControl("lblEduContents")).Text.ToString().Replace("<br />", "\n");
-        }
-        else
-        {
-            btnEduEdit.Text = "수정";
-            panEditEdu.Visible = false;
-        }
-    }
-
     protected void btnInsertEdu_Click(object sender, EventArgs e)
     {
         string EduJoinDate = txtEduJoinYear.Text.ToString() + "년 " + txtEduJoinMonth.Text.ToString() + "월";
@@ -549,50 +461,6 @@
         con.Close();
 
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
-    protected void btnAwardsAdd_Click(object sender, EventArgs e)
-    {
-        if(!panAddAwards.Visible)
-        {
-            btnAwardsAdd.Text = "취소";
-            panAddAwards.Visible = true;
-
-            btnAwardsEdit.Text = "수정";
-            panEditAwards.Visible = false;
-        }
-        else
-        {
-            btnAwardsAdd.Text = "추가";
-            panAddAwards.Visible = false;
-        }
-    }
-
-    protected void btnAwardsEdit_Click(object sender, EventArgs e)
-    {
-        if(!panEditAwards.Visible)
-        {
-            btnAwardsEdit.Text = "취소";
-            panEditAwards.Visible = true;
-
-            btnAwardsAdd.Text = "추가";
-            panAddAwards.Visible = false;
-
-            String[] joinDate = ((Label)lvAwards.Items[0].FindControl("lblAwardsJoinDate")).Text.Split('년');
-            String[] leaveDate = ((Label)lvAwards.Items[0].FindControl("lblAwardsLeaveDate")).Text.Split('년');
-
-            txtEditAwardsTitle.Text = ((Label) lvAwards.Items[0].FindControl("lblAwardsTitle")).Text;
-            txtEditAwardsJoinYear.Text = joinDate[0];
-            txtEditAwardsJoinMonth.Text = joinDate[1].TrimEnd('월').TrimStart(' ');
-            txtEditAwardsLeaveYear.Text = leaveDate[0];
-            txtEditAwardsLeaveMonth.Text = leaveDate[1].TrimEnd('월').TrimStart(' ');
-            txtEditAwardsContents.Text = ((Label) lvAwards.Items[0].FindControl("lblAwardsContents")).Text.ToString().Replace("<br />", "\n");
-        }
-        else
-        {
-            btnAwardsEdit.Text = "수정";
-            panEditAwards.Visible = false;
-        }
     }
 
     protected void btnInsertAwards_Click(object sender, EventArgs e)
@@ -748,6 +616,75 @@
     protected void btnExplore_Click(object sender, EventArgs e)
     {
         Response.Redirect("explore.aspx");
+    }
+    
+    protected void btnBoardAdd_Command(object sender, CommandEventArgs e)
+    {
+        string boardType = e.CommandArgument.ToString();
+
+        Panel panEdit = (Panel)Page.FindControl("panEdit"+boardType);
+        Button btnEdit = (Button)Page.FindControl("btn"+boardType+"Edit");
+
+        Panel panAdd = (Panel)Page.FindControl("panAdd"+boardType);
+        Button btnAdd = (Button)Page.FindControl("btn"+boardType+"Add");
+
+        if(!panAdd.Visible)
+        {
+            panAdd.Visible = true;
+            btnAdd.Text = "취소";
+            
+            panEdit.Visible = false;
+            btnEdit.Text = "수정";
+        }
+        else
+        {
+            panAdd.Visible = false;
+            btnAdd.Text = "추가";
+        }
+    }
+
+    protected void btnBoardEdit_Command(object sender, CommandEventArgs e)
+    {
+        string boardType = e.CommandArgument.ToString();
+
+        ListView listView = (ListView)Page.FindControl("lv" + boardType);
+
+        Panel panEdit = (Panel)Page.FindControl("panEdit"+boardType);
+        Button btnEdit = (Button)Page.FindControl("btn"+boardType+"Edit");
+
+        Panel panAdd = (Panel)Page.FindControl("panAdd"+boardType);
+        Button btnAdd = (Button)Page.FindControl("btn"+boardType+"Add");
+
+        String[] joinDate = ((Label)listView.Items[0].FindControl("lbl"+boardType+"JoinDate")).Text.Split('년');
+        String[] leaveDate = ((Label)listView.Items[0].FindControl("lbl"+boardType+"LeaveDate")).Text.Split('년');
+
+        TextBox txtEditTitle = (TextBox)Page.FindControl("txtEdit"+boardType+"Title");
+        TextBox txtEditJoinYear = (TextBox)Page.FindControl("txtEdit"+boardType+"JoinYear");
+        TextBox txtEditJoinMonth = (TextBox)Page.FindControl("txtEdit"+boardType+"JoinMonth");
+        TextBox txtEditLeaveYear = (TextBox)Page.FindControl("txtEdit"+boardType+"LeaveYear");
+        TextBox txtEditLeavMonth = (TextBox)Page.FindControl("txtEdit"+boardType+"LeaveMonth");
+        TextBox txtEditContents = (TextBox)Page.FindControl("txtEdit"+boardType+"Contents");
+
+        if(!panEdit.Visible)
+        {
+            panEdit.Visible = true;
+            btnEdit.Text = "취소";
+
+            panAdd.Visible = false;
+            btnAdd.Text = "추가";
+
+            txtEditTitle.Text = ((Label) listView.Items[0].FindControl("lbl"+boardType+"Title")).Text;
+            txtEditJoinYear.Text = joinDate[0];
+            txtEditJoinMonth.Text = joinDate[1].TrimEnd('월').TrimStart(' ');
+            txtEditLeaveYear.Text = leaveDate[0];
+            txtEditLeavMonth.Text = leaveDate[1].TrimEnd('월').TrimStart(' ');
+            txtEditContents.Text = ((Label)listView.Items[0].FindControl("lbl"+boardType+"Contents")).Text.ToString().Replace("<br />", "\n");
+        }
+        else
+        {
+            panEdit.Visible = false;
+            btnEdit.Text = "수정";
+        }
     }
 </script>
 
@@ -1011,9 +948,9 @@
                 <div class="w3-twothird">
                     <div class="w3-container w3-card w3-white w3-margin-bottom">
                         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Work Experience</h2>
-                        <asp:Button ID="btnWorkAdd" runat="server" Text="추가" Visible="false" OnClick="btnWorkAdd_Click" 
+                        <asp:Button ID="btnWorkAdd" runat="server" Text="추가" Visible="false" OnCommand="btnBoardAdd_Command" CommandArgument="Work"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:2.5px;" />
-                        <asp:Button ID="btnWorkEdit" runat="server" Text="수정" Visible="false" OnClick="btnWorkEdit_Click"
+                        <asp:Button ID="btnWorkEdit" runat="server" Text="수정" Visible="false" OnCommand="btnBoardEdit_Command" CommandArgument="Work"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
                         <asp:ListView ID="lvWork" runat="server" DataSourceID="SqlDataSource3" OnPagePropertiesChanged="lvWork_PagePropertiesChanged">
@@ -1102,9 +1039,9 @@
 
                     <div class="w3-container w3-card w3-white w3-margin-bottom">
                         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-graduation-cap fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Education</h2>
-                        <asp:Button ID="btnEduAdd" runat="server" Text="추가" Visible="false" OnClick="btnEduAdd_Click" 
+                        <asp:Button ID="btnEduAdd" runat="server" Text="추가" Visible="false" OnCommand="btnBoardAdd_Command" CommandArgument="Edu"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:2.5px;" />
-                        <asp:Button ID="btnEduEdit" runat="server" Text="수정" Visible="false" OnClick="btnEduEdit_Click" 
+                        <asp:Button ID="btnEduEdit" runat="server" Text="수정" Visible="false" OnCommand="btnBoardEdit_Command" CommandArgument="Edu"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
                         <asp:ListView ID="lvEdu" runat="server" DataSourceID="SqlDataSource4" OnPagePropertiesChanged="lvEdu_PagePropertiesChanged">
@@ -1193,9 +1130,9 @@
 
                     <div class="w3-container w3-card w3-white w3-margin-bottom">
                         <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-trophy fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Awards</h2>
-                        <asp:Button ID="btnAwardsAdd" runat="server" Text="추가" Visible="false" OnClick="btnAwardsAdd_Click" 
+                        <asp:Button ID="btnAwardsAdd" runat="server" Text="추가" Visible="false" OnCommand="btnBoardAdd_Command" CommandArgument="Awards"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:2.5px;" />
-                        <asp:Button ID="btnAwardsEdit" runat="server" Text="수정" Visible="false" OnClick="btnAwardsEdit_Click" 
+                        <asp:Button ID="btnAwardsEdit" runat="server" Text="수정" Visible="false" OnCommand="btnBoardEdit_Command" CommandArgument="Awards"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
                         <asp:ListView ID="lvAwards" runat="server" DataSourceID="SqlDataSource5" OnPagePropertiesChanged="lvAwards_PagePropertiesChanged">
