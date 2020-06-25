@@ -331,28 +331,6 @@
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 
-    protected void btnInsertWork_Click(object sender, EventArgs e)
-    {
-        string WorkJoinDate = txtWorkJoinYear.Text.ToString() + "년 " + txtWorkJoinMonth.Text.ToString() + "월";
-        string WorkLeaveDate = txtWorkLeaveYear.Text.ToString() + "년 " + txtWorkLeaveMonth.Text.ToString() + "월";
-
-        string sql = "INSERT INTO Board(email, title, joindate, leavedate, contents, type) VALUES(@email, @title, @joindate, @leavedate, @contents, @type)";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@title", txtWorkTitle.Text);
-        cmd.Parameters.AddWithValue("@joindate", WorkJoinDate);
-        cmd.Parameters.AddWithValue("@leavedate", WorkLeaveDate);
-        cmd.Parameters.AddWithValue("@contents", txtWorkContents.Text);
-        cmd.Parameters.AddWithValue("@type", "1");
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
     protected void btnDeleteWork_Click(object sender, EventArgs e)
     {
         string workNum = ((HiddenField) lvWork.Items[0].FindControl("fieldWorkNum")).Value.ToString();
@@ -397,28 +375,6 @@
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 
-    protected void btnInsertEdu_Click(object sender, EventArgs e)
-    {
-        string EduJoinDate = txtEduJoinYear.Text.ToString() + "년 " + txtEduJoinMonth.Text.ToString() + "월";
-        string EduLeaveDate = txtEduLeaveYear.Text.ToString() + "년 " + txtEduLeaveMonth.Text.ToString() + "월";
-
-        string sql = "INSERT INTO Board(email, title, joindate, leavedate, contents, type) VALUES(@email, @title, @joindate, @leavedate, @contents, @type)";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@title", txtEduTitle.Text);
-        cmd.Parameters.AddWithValue("@joindate", EduJoinDate);
-        cmd.Parameters.AddWithValue("@leavedate", EduLeaveDate);
-        cmd.Parameters.AddWithValue("@contents", txtEduContents.Text);
-        cmd.Parameters.AddWithValue("@type", "2");
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
     protected void btnDeleteEdu_Click(object sender, EventArgs e)
     {
         string EduNum = ((HiddenField) lvEdu.Items[0].FindControl("fieldEduNum")).Value.ToString();
@@ -455,28 +411,6 @@
 
         cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
         cmd.Parameters.AddWithValue("@num", EduNum);
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
-    protected void btnInsertAwards_Click(object sender, EventArgs e)
-    {
-        string AwardsJoinDate = txtAwardsJoinYear.Text.ToString() + "년 " + txtAwardsJoinMonth.Text.ToString() + "월";
-        string AwardsLeaveDate = txtAwardsLeaveYear.Text.ToString() + "년 " + txtAwardsLeaveMonth.Text.ToString() + "월";
-
-        string sql = "INSERT INTO Board(email, title, joindate, leavedate, contents, type) VALUES(@email, @title, @joindate, @leavedate, @contents, @type)";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@title", txtAwardsTitle.Text);
-        cmd.Parameters.AddWithValue("@joindate", AwardsJoinDate);
-        cmd.Parameters.AddWithValue("@leavedate", AwardsLeaveDate);
-        cmd.Parameters.AddWithValue("@contents", txtAwardsContents.Text);
-        cmd.Parameters.AddWithValue("@type", "3");
 
         con.Open();
         cmd.ExecuteNonQuery();
@@ -617,7 +551,7 @@
     {
         Response.Redirect("explore.aspx");
     }
-    
+
     protected void btnBoardAdd_Command(object sender, CommandEventArgs e)
     {
         string boardType = e.CommandArgument.ToString();
@@ -632,7 +566,7 @@
         {
             panAdd.Visible = true;
             btnAdd.Text = "취소";
-            
+
             panEdit.Visible = false;
             btnEdit.Text = "수정";
         }
@@ -685,6 +619,40 @@
             panEdit.Visible = false;
             btnEdit.Text = "수정";
         }
+    }
+
+    protected void btnInsertBoard_Command(object sender, CommandEventArgs e)
+    {
+        string boardType = e.CommandArgument.ToString();
+
+        TextBox txtTitle = (TextBox)Page.FindControl("txt"+boardType+"Title");
+        TextBox txtJoinYear = (TextBox)Page.FindControl("txt"+boardType+"JoinYear");
+        TextBox txtJoinMonth = (TextBox)Page.FindControl("txt"+boardType+"JoinMonth");
+        TextBox txtLeaveYear = (TextBox)Page.FindControl("txt"+boardType+"LeaveYear");
+        TextBox txtLeavMonth = (TextBox)Page.FindControl("txt"+boardType+"LeaveMonth");
+        TextBox txtContents = (TextBox)Page.FindControl("txt"+boardType+"Contents");
+
+        string joinDate = txtJoinYear.Text.ToString() + "년 " + txtJoinMonth.Text.ToString() + "월";
+        string leaveDate = txtLeaveYear.Text.ToString() + "년 " + txtLeavMonth.Text.ToString() + "월";
+
+        string sql = "INSERT INTO Board(email, title, joindate, leavedate, contents, type) VALUES(@email, @title, @joindate, @leavedate, @contents, @type)";
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+        cmd.Parameters.AddWithValue("@title", txtTitle.Text);
+        cmd.Parameters.AddWithValue("@joindate", joinDate);
+        cmd.Parameters.AddWithValue("@leavedate", leaveDate);
+        cmd.Parameters.AddWithValue("@contents", txtContents.Text);
+
+        if (boardType.Equals("Work")) cmd.Parameters.AddWithValue("@type", "1");
+        else if(boardType.Equals("Edu")) cmd.Parameters.AddWithValue("@type", "2");
+        else cmd.Parameters.AddWithValue("@type", "3");
+
+        con.Open();
+        cmd.ExecuteNonQuery();
+        con.Close();
+
+        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 </script>
 
@@ -989,7 +957,7 @@
                             <hr />
 
                             <asp:TextBox ID="txtWorkTitle" runat="server" placeholder="회사 명" style="width:92%; height:37px; padding-left:5px;"></asp:TextBox>
-                            <asp:Button ID="btnInsertWork" runat="server" Text="등록" OnClick="btnInsertWork_Click" 
+                            <asp:Button ID="btnInsertWork" runat="server" Text="등록" OnCommand="btnInsertBoard_Command" CommandArgument="Work"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <br /><br />
 
@@ -1080,7 +1048,7 @@
                             <hr />
 
                             <asp:TextBox ID="txtEduTitle" runat="server" placeholder="학교 명" style="width:92%; height:37px; padding-left:5px;"></asp:TextBox>
-                            <asp:Button ID="btnInsertEdu" runat="server" Text="등록" OnClick="btnInsertEdu_Click" 
+                            <asp:Button ID="btnInsertEdu" runat="server" Text="등록" OnCommand="btnInsertBoard_Command" CommandArgument="Edu"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <br /><br />
 
@@ -1171,7 +1139,7 @@
                             <hr />
 
                             <asp:TextBox ID="txtAwardsTitle" runat="server" placeholder="대회 명" style="width:92%; height:37px; padding-left:5px;"></asp:TextBox>
-                            <asp:Button ID="btnInsertAwards" runat="server" Text="등록" OnClick="btnInsertAwards_Click" 
+                            <asp:Button ID="btnInsertAwards" runat="server" Text="등록" OnCommand="btnInsertBoard_Command" CommandArgument="Awards"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <br /><br />
 
