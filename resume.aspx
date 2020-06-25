@@ -348,33 +348,6 @@
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 
-    protected void btnUpdateWork_Click(object sender, EventArgs e)
-    {
-        string WorkNum = ((HiddenField) lvWork.Items[0].FindControl("fieldWorkNum")).Value.ToString();
-        string WorkTitle = txtEditWorkTitle.Text.ToString();
-        string WorkJoinDate = txtEditWorkJoinYear.Text.ToString() + "년 " + txtEditWorkJoinMonth.Text.ToString() + "월";
-        string WorkLeaveDate = txtEditWorkLeaveYear.Text.ToString() + "년 " + txtEditWorkLeaveMonth.Text.ToString() + "월";
-        string WorkContents = txtEditWorkContents.Text.ToString();
-
-        string sql = "UPDATE Board SET title = @title, joindate = @joindate, leavedate = @leavedate, contents = @contents " +
-                "WHERE email = @email AND num = @num";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@title", WorkTitle);
-        cmd.Parameters.AddWithValue("@joindate", WorkJoinDate);
-        cmd.Parameters.AddWithValue("@leavedate", WorkLeaveDate);
-        cmd.Parameters.AddWithValue("@contents", WorkContents);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@num", WorkNum);
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
     protected void btnDeleteEdu_Click(object sender, EventArgs e)
     {
         string EduNum = ((HiddenField) lvEdu.Items[0].FindControl("fieldEduNum")).Value.ToString();
@@ -392,66 +365,12 @@
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 
-    protected void btnUpdateEdu_Click(object sender, EventArgs e)
-    {
-        string EduNum = ((HiddenField) lvEdu.Items[0].FindControl("fieldEduNum")).Value.ToString();
-        string EduTitle = txtEditEduTitle.Text.ToString();
-        string EduJoinDate = txtEditEduJoinYear.Text.ToString() + "년 " + txtEditEduJoinMonth.Text.ToString() + "월";
-        string EduLeaveDate = txtEditEduLeaveYear.Text.ToString() + "년 " + txtEditEduLeaveMonth.Text.ToString() + "월";
-        string EduContents = txtEditEduContents.Text.ToString();
-
-        string sql = "UPDATE Board SET title = @title, joindate = @joindate, leavedate = @leavedate, contents = @contents " +
-                "WHERE email = @email AND num = @num";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@title", EduTitle);
-        cmd.Parameters.AddWithValue("@joindate", EduJoinDate);
-        cmd.Parameters.AddWithValue("@leavedate", EduLeaveDate);
-        cmd.Parameters.AddWithValue("@contents", EduContents);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@num", EduNum);
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
     protected void btnDeleteAwards_Click(object sender, EventArgs e)
     {
         string AwardsNum = ((HiddenField) lvAwards.Items[0].FindControl("fieldAwardsNum")).Value.ToString();
 
         string sql = "DELETE FROM Board WHERE email = @email and num = @num";
         SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@num", AwardsNum);
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
-    protected void btnUpdateAwards_Click(object sender, EventArgs e)
-    {
-        string AwardsNum = ((HiddenField) lvAwards.Items[0].FindControl("fieldAwardsNum")).Value.ToString();
-        string AwardsTitle = txtEditAwardsTitle.Text.ToString();
-        string AwardsJoinDate = txtEditAwardsJoinYear.Text.ToString() + "년 " + txtEditAwardsJoinMonth.Text.ToString() + "월";
-        string AwardsLeaveDate = txtEditAwardsLeaveYear.Text.ToString() + "년 " + txtEditAwardsLeaveMonth.Text.ToString() + "월";
-        string AwardsContents = txtEditAwardsContents.Text.ToString();
-
-        string sql = "UPDATE Board SET title = @title, joindate = @joindate, leavedate = @leavedate, contents = @contents " +
-                "WHERE email = @email AND num = @num";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@title", AwardsTitle);
-        cmd.Parameters.AddWithValue("@joindate", AwardsJoinDate);
-        cmd.Parameters.AddWithValue("@leavedate", AwardsLeaveDate);
-        cmd.Parameters.AddWithValue("@contents", AwardsContents);
 
         cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
         cmd.Parameters.AddWithValue("@num", AwardsNum);
@@ -647,6 +566,43 @@
         if (boardType.Equals("Work")) cmd.Parameters.AddWithValue("@type", "1");
         else if(boardType.Equals("Edu")) cmd.Parameters.AddWithValue("@type", "2");
         else cmd.Parameters.AddWithValue("@type", "3");
+
+        con.Open();
+        cmd.ExecuteNonQuery();
+        con.Close();
+
+        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+    }
+
+    protected void btnUpdateBoard_Command(object sender, CommandEventArgs e)
+    {
+        string boardType = e.CommandArgument.ToString();
+
+        ListView listView = (ListView)Page.FindControl("lv" + boardType);
+        TextBox txtEditTitle = (TextBox)Page.FindControl("txtEdit"+boardType+"Title");
+        TextBox txtEditJoinYear = (TextBox)Page.FindControl("txtEdit"+boardType+"JoinYear");
+        TextBox txtEditJoinMonth = (TextBox)Page.FindControl("txtEdit"+boardType+"JoinMonth");
+        TextBox txtEditLeaveYear = (TextBox)Page.FindControl("txtEdit"+boardType+"LeaveYear");
+        TextBox txtEditLeavMonth = (TextBox)Page.FindControl("txtEdit"+boardType+"LeaveMonth");
+        TextBox txtEditContents = (TextBox)Page.FindControl("txtEdit"+boardType+"Contents");
+        
+        string boardNum = ((HiddenField) listView.Items[0].FindControl("field"+boardType+"Num")).Value.ToString();
+        string boardTitle = txtEditTitle.Text.ToString();
+        string boardJoinDate = txtEditJoinYear.Text.ToString() + "년 " + txtEditJoinMonth.Text.ToString() + "월";
+        string boardLeaveDate = txtEditLeaveYear.Text.ToString() + "년 " + txtEditLeavMonth.Text.ToString() + "월";
+        string boardContents = txtEditContents.Text.ToString();
+
+        string sql = "UPDATE Board SET title = @title, joindate = @joindate, leavedate = @leavedate, contents = @contents " +
+                "WHERE email = @email AND num = @num";
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        cmd.Parameters.AddWithValue("@title", boardTitle);
+        cmd.Parameters.AddWithValue("@joindate", boardJoinDate);
+        cmd.Parameters.AddWithValue("@leavedate", boardLeaveDate);
+        cmd.Parameters.AddWithValue("@contents", boardContents);
+
+        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+        cmd.Parameters.AddWithValue("@num", boardNum);
 
         con.Open();
         cmd.ExecuteNonQuery();
@@ -984,7 +940,7 @@
                             <asp:TextBox ID="txtEditWorkTitle" runat="server" style="width:85%; height:38px; padding-left:5px;"></asp:TextBox>
                             <asp:Button ID="btnDeleteWork" runat="server" Text="삭제" OnClick="btnDeleteWork_Click" 
                                     CssClass="w3-button w3-red w3-right" style="margin-top:0px; margin-right:2.5px;" />
-                            <asp:Button ID="btnUpdateWork" runat="server" Text="등록" OnClick="btnUpdateWork_Click" 
+                            <asp:Button ID="btnUpdateWork" runat="server" Text="등록" OnCommand="btnUpdateBoard_Command" CommandArgument="Work"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <br /><br />
 
@@ -1075,7 +1031,7 @@
                             <asp:TextBox ID="txtEditEduTitle" runat="server" style="width:85%; height:38px; padding-left:5px;"></asp:TextBox>
                             <asp:Button ID="btnDeleteEdu" runat="server" Text="삭제" OnClick="btnDeleteEdu_Click" 
                                     CssClass="w3-button w3-red w3-right" style="margin-top:0px; margin-right:2.5px;" />
-                            <asp:Button ID="btnUpdateEdu" runat="server" Text="등록" OnClick="btnUpdateEdu_Click" 
+                            <asp:Button ID="btnUpdateEdu" runat="server" Text="등록" OnCommand="btnUpdateBoard_Command" CommandArgument="Edu"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <br /><br />
 
@@ -1166,7 +1122,7 @@
                             <asp:TextBox ID="txtEditAwardsTitle" runat="server" style="width:85%; height:38px; padding-left:5px;"></asp:TextBox>
                             <asp:Button ID="btnDeleteAwards" runat="server" Text="삭제" OnClick="btnDeleteAwards_Click" 
                                     CssClass="w3-button w3-red w3-right" style="margin-top:0px; margin-right:2.5px;" />
-                            <asp:Button ID="btnUpdateAwards" runat="server" Text="등록" OnClick="btnUpdateAwards_Click" 
+                            <asp:Button ID="btnUpdateAwards" runat="server" Text="등록" OnCommand="btnUpdateBoard_Command" CommandArgument="Awards"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <br /><br />
 
