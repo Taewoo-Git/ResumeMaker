@@ -331,95 +331,6 @@
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 
-    protected void lvWork_PagePropertiesChanged(object sender, EventArgs e)
-    {
-        btnWorkEdit.Text = "수정";
-        panEditWork.Visible = false;
-
-        btnWorkAdd.Text = "추가";
-        panAddWork.Visible = false;
-    }
-
-    protected void lvEdu_PagePropertiesChanged(object sender, EventArgs e)
-    {
-        btnEduEdit.Text = "수정";
-        panEditEdu.Visible = false;
-
-        btnEduAdd.Text = "추가";
-        panAddEdu.Visible = false;
-    }
-
-    protected void lvAwards_PagePropertiesChanged(object sender, EventArgs e)
-    {
-        btnAwardsEdit.Text = "수정";
-        panEditAwards.Visible = false;
-
-        btnAwardsAdd.Text = "추가";
-        panAddAwards.Visible = false;
-    }
-
-    protected void btnShare_Click(object sender, EventArgs e)
-    {
-        string sql;
-
-        if(btnShare.Text.Equals("Share")) sql = "UPDATE Member SET shared = 'Y' WHERE email = @email";
-        else sql = "UPDATE Member SET shared = 'N' WHERE email = @email";
-
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
-    protected void btnRecommend_Click(object sender, EventArgs e)
-    {
-        if (!Session["usersession"].Equals("none"))
-        {
-            string sql;
-
-            if(btnRecommend.Text.Equals("Recommend"))
-            {
-                btnRecommend.Text = "Unrecommend";
-                sql = "INSERT INTO Stars(email, recommender) VALUES(@email, @recommender)";
-            }
-            else
-            {
-                btnRecommend.Text = "Recommend";
-                sql = "DELETE FROM Stars WHERE email = @email AND recommender = @recommender";
-            }
-            SqlCommand cmd = new SqlCommand(sql, con);
-
-            cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-            cmd.Parameters.AddWithValue("@recommender", Session["usersession"]);
-
-            con.Open();
-            cmd.ExecuteNonQuery();
-            con.Close();
-
-            Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-        }
-        else
-        {
-            ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert('추천은 회원만 가능합니다.')", true);
-        }
-    }
-
-    protected void btnSignout_Click(object sender, EventArgs e)
-    {
-        Session["usersession"] = null;
-        Response.Redirect("login.aspx");
-    }
-
-    protected void btnExplore_Click(object sender, EventArgs e)
-    {
-        Response.Redirect("explore.aspx");
-    }
-
     protected void btnBoardAdd_Command(object sender, CommandEventArgs e)
     {
         string boardType = e.CommandArgument.ToString();
@@ -578,6 +489,86 @@
         con.Close();
 
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+    }
+
+    protected void Board_PagePropertiesChanged(object sender, EventArgs e)
+    {
+        ListView listView = (ListView) sender;
+        string boardType = listView.ID.TrimStart('l','v');
+
+        Panel panEdit = (Panel)Page.FindControl("panEdit"+boardType);
+        Button btnEdit = (Button)Page.FindControl("btn"+boardType+"Edit");
+
+        Panel panAdd = (Panel)Page.FindControl("panAdd"+boardType);
+        Button btnAdd = (Button)Page.FindControl("btn"+boardType+"Add");
+        
+        panEdit.Visible = false;
+        btnEdit.Text = "수정";
+        
+        panAdd.Visible = false;
+        btnAdd.Text = "추가";
+    }
+
+    protected void btnShare_Click(object sender, EventArgs e)
+    {
+        string sql;
+
+        if(btnShare.Text.Equals("Share")) sql = "UPDATE Member SET shared = 'Y' WHERE email = @email";
+        else sql = "UPDATE Member SET shared = 'N' WHERE email = @email";
+
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+
+        con.Open();
+        cmd.ExecuteNonQuery();
+        con.Close();
+
+        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+    }
+
+    protected void btnRecommend_Click(object sender, EventArgs e)
+    {
+        if (!Session["usersession"].Equals("none"))
+        {
+            string sql;
+
+            if(btnRecommend.Text.Equals("Recommend"))
+            {
+                btnRecommend.Text = "Unrecommend";
+                sql = "INSERT INTO Stars(email, recommender) VALUES(@email, @recommender)";
+            }
+            else
+            {
+                btnRecommend.Text = "Recommend";
+                sql = "DELETE FROM Stars WHERE email = @email AND recommender = @recommender";
+            }
+            SqlCommand cmd = new SqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+            cmd.Parameters.AddWithValue("@recommender", Session["usersession"]);
+
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+
+            Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+        }
+        else
+        {
+            ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert('추천은 회원만 가능합니다.')", true);
+        }
+    }
+
+    protected void btnSignout_Click(object sender, EventArgs e)
+    {
+        Session["usersession"] = null;
+        Response.Redirect("login.aspx");
+    }
+
+    protected void btnExplore_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("explore.aspx");
     }
 </script>
 
@@ -846,7 +837,7 @@
                         <asp:Button ID="btnWorkEdit" runat="server" Text="수정" Visible="false" OnCommand="btnBoardEdit_Command" CommandArgument="Work"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
-                        <asp:ListView ID="lvWork" runat="server" DataSourceID="SqlDataSource3" OnPagePropertiesChanged="lvWork_PagePropertiesChanged">
+                        <asp:ListView ID="lvWork" runat="server" DataSourceID="SqlDataSource3" OnPagePropertiesChanged="Board_PagePropertiesChanged">
                             <ItemTemplate>
                                 <div class="w3-container">
                                     <h5 class="w3-opacity">
@@ -937,7 +928,7 @@
                         <asp:Button ID="btnEduEdit" runat="server" Text="수정" Visible="false" OnCommand="btnBoardEdit_Command" CommandArgument="Edu"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
-                        <asp:ListView ID="lvEdu" runat="server" DataSourceID="SqlDataSource4" OnPagePropertiesChanged="lvEdu_PagePropertiesChanged">
+                        <asp:ListView ID="lvEdu" runat="server" DataSourceID="SqlDataSource4" OnPagePropertiesChanged="Board_PagePropertiesChanged">
                             <ItemTemplate>
                                 <div class="w3-container">
                                     <h5 class="w3-opacity">
@@ -1028,7 +1019,7 @@
                         <asp:Button ID="btnAwardsEdit" runat="server" Text="수정" Visible="false" OnCommand="btnBoardEdit_Command" CommandArgument="Awards"
                                 CssClass="w3-button w3-teal w3-right w3-padding-small" style="margin-top:-60px; margin-right:60px;" />
 
-                        <asp:ListView ID="lvAwards" runat="server" DataSourceID="SqlDataSource5" OnPagePropertiesChanged="lvAwards_PagePropertiesChanged">
+                        <asp:ListView ID="lvAwards" runat="server" DataSourceID="SqlDataSource5" OnPagePropertiesChanged="Board_PagePropertiesChanged">
                             <ItemTemplate>
                                 <div class="w3-container">
                                     <h5 class="w3-opacity">
