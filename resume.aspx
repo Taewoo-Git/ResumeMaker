@@ -331,57 +331,6 @@
         Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
     }
 
-    protected void btnDeleteWork_Click(object sender, EventArgs e)
-    {
-        string workNum = ((HiddenField) lvWork.Items[0].FindControl("fieldWorkNum")).Value.ToString();
-
-        string sql = "DELETE FROM Board WHERE email = @email and num = @num";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@num", workNum);
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
-    protected void btnDeleteEdu_Click(object sender, EventArgs e)
-    {
-        string EduNum = ((HiddenField) lvEdu.Items[0].FindControl("fieldEduNum")).Value.ToString();
-
-        string sql = "DELETE FROM Board WHERE email = @email and num = @num";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@num", EduNum);
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
-    protected void btnDeleteAwards_Click(object sender, EventArgs e)
-    {
-        string AwardsNum = ((HiddenField) lvAwards.Items[0].FindControl("fieldAwardsNum")).Value.ToString();
-
-        string sql = "DELETE FROM Board WHERE email = @email and num = @num";
-        SqlCommand cmd = new SqlCommand(sql, con);
-
-        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
-        cmd.Parameters.AddWithValue("@num", AwardsNum);
-
-        con.Open();
-        cmd.ExecuteNonQuery();
-        con.Close();
-
-        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
-    }
-
     protected void lvWork_PagePropertiesChanged(object sender, EventArgs e)
     {
         btnWorkEdit.Text = "수정";
@@ -585,7 +534,7 @@
         TextBox txtEditLeaveYear = (TextBox)Page.FindControl("txtEdit"+boardType+"LeaveYear");
         TextBox txtEditLeavMonth = (TextBox)Page.FindControl("txtEdit"+boardType+"LeaveMonth");
         TextBox txtEditContents = (TextBox)Page.FindControl("txtEdit"+boardType+"Contents");
-        
+
         string boardNum = ((HiddenField) listView.Items[0].FindControl("field"+boardType+"Num")).Value.ToString();
         string boardTitle = txtEditTitle.Text.ToString();
         string boardJoinDate = txtEditJoinYear.Text.ToString() + "년 " + txtEditJoinMonth.Text.ToString() + "월";
@@ -603,6 +552,26 @@
 
         cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
         cmd.Parameters.AddWithValue("@num", boardNum);
+
+        con.Open();
+        cmd.ExecuteNonQuery();
+        con.Close();
+
+        Response.Redirect("resume.aspx?useremail=" + Request.QueryString["useremail"]);
+    }
+
+    protected void btnDeleteBoard_Command(object sender, CommandEventArgs e)
+    {
+        string boardType = e.CommandArgument.ToString();
+
+        ListView listView = (ListView)Page.FindControl("lv" + boardType);
+        string workNum = ((HiddenField) listView.Items[0].FindControl("field"+boardType+"Num")).Value.ToString();
+
+        string sql = "DELETE FROM Board WHERE email = @email and num = @num";
+        SqlCommand cmd = new SqlCommand(sql, con);
+
+        cmd.Parameters.AddWithValue("@email", Request.QueryString["useremail"]);
+        cmd.Parameters.AddWithValue("@num", workNum);
 
         con.Open();
         cmd.ExecuteNonQuery();
@@ -938,7 +907,7 @@
                             <hr />
 
                             <asp:TextBox ID="txtEditWorkTitle" runat="server" style="width:85%; height:38px; padding-left:5px;"></asp:TextBox>
-                            <asp:Button ID="btnDeleteWork" runat="server" Text="삭제" OnClick="btnDeleteWork_Click" 
+                            <asp:Button ID="btnDeleteWork" runat="server" Text="삭제" OnCommand="btnDeleteBoard_Command" CommandArgument="Work"
                                     CssClass="w3-button w3-red w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <asp:Button ID="btnUpdateWork" runat="server" Text="등록" OnCommand="btnUpdateBoard_Command" CommandArgument="Work"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
@@ -1029,7 +998,7 @@
                             <hr />
 
                             <asp:TextBox ID="txtEditEduTitle" runat="server" style="width:85%; height:38px; padding-left:5px;"></asp:TextBox>
-                            <asp:Button ID="btnDeleteEdu" runat="server" Text="삭제" OnClick="btnDeleteEdu_Click" 
+                            <asp:Button ID="btnDeleteEdu" runat="server" Text="삭제" OnCommand="btnDeleteBoard_Command" CommandArgument="Edu"
                                     CssClass="w3-button w3-red w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <asp:Button ID="btnUpdateEdu" runat="server" Text="등록" OnCommand="btnUpdateBoard_Command" CommandArgument="Edu"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
@@ -1120,7 +1089,7 @@
                             <hr />
 
                             <asp:TextBox ID="txtEditAwardsTitle" runat="server" style="width:85%; height:38px; padding-left:5px;"></asp:TextBox>
-                            <asp:Button ID="btnDeleteAwards" runat="server" Text="삭제" OnClick="btnDeleteAwards_Click" 
+                            <asp:Button ID="btnDeleteAwards" runat="server" Text="삭제" OnCommand="btnDeleteBoard_Command" CommandArgument="Awards"
                                     CssClass="w3-button w3-red w3-right" style="margin-top:0px; margin-right:2.5px;" />
                             <asp:Button ID="btnUpdateAwards" runat="server" Text="등록" OnCommand="btnUpdateBoard_Command" CommandArgument="Awards"
                                     CssClass="w3-button w3-teal w3-right" style="margin-top:0px; margin-right:2.5px;" />
