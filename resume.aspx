@@ -9,11 +9,13 @@
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        string email = Request.QueryString["useremail"];
-        if (string.IsNullOrEmpty(email)) Response.Redirect("login.aspx");
-
         con = new SqlConnection("Data Source=.\\SQLEXPRESS; Initial Catalog=resume_maker_db;" +
             "Integrated Security=False; uid=taewoo; pwd=1111");
+
+        string email = Request.QueryString["useremail"];
+        if (string.IsNullOrEmpty(email)) Response.Redirect("login.aspx");
+        else if (email.Equals("admin")) Response.Redirect("explore.aspx");
+        else if (!selectMember(email)) Response.Redirect("explore.aspx");
 
         string myip = Request.UserHostAddress;
 
@@ -79,6 +81,29 @@
         checkStars(email);
 
         Page.Title = lblPageTitle.Text;
+    }
+
+    protected bool selectMember(string email)
+    {
+        bool isMember = false;
+
+        string sql = "SELECT count(email) FROM Member WHERE email = @email;";
+
+        SqlCommand cmd = new SqlCommand(sql, con);
+        cmd.Parameters.AddWithValue("@email", email);
+
+        con.Open();
+        if (((int)cmd.ExecuteScalar()) > 0)
+        {
+            isMember = true;
+        }
+        else
+        {
+            isMember = false;
+        }
+        con.Close();
+
+        return isMember;
     }
 
     protected void initProfile(string email)
@@ -501,10 +526,10 @@
 
         Panel panAdd = (Panel)Page.FindControl("panAdd"+boardType);
         Button btnAdd = (Button)Page.FindControl("btn"+boardType+"Add");
-        
+
         panEdit.Visible = false;
         btnEdit.Text = "수정";
-        
+
         panAdd.Visible = false;
         btnAdd.Text = "추가";
     }
