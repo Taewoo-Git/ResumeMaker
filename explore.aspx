@@ -13,6 +13,11 @@
             SqlDataSource1.SelectCommand = "SELECT m.email, m.name, m.viewer, (select count(num) from Stars where email=m.email) as 'stars' FROM Member m;";
         }
     }
+
+    protected void btnExit_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("login.aspx");
+    }
 </script>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -24,6 +29,7 @@
 <body>
     <form id="form1" runat="server">
         <div id="modal" class="w3-modal">
+            <asp:Button ID="btnExit" runat="server" Text="Exit" CssClass="w3-button w3-red w3-padding-small" style="position:absolute; left:64%; top:11%; width:80px;" OnClick="btnExit_Click"/>
             <div class="w3-container w3-content w3-card w3-white w3-margin-top w3-round-large" style="max-width:600px;">
                 <div class="w3-section">
                     <asp:GridView ID="gvExplore" runat="server" AutoGenerateColumns="False" DataKeyNames="email" DataSourceID="SqlDataSource1" Width="100%"
